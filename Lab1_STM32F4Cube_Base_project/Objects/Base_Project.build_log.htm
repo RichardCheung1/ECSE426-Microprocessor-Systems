@@ -1,0 +1,78 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: µVision V5.17.0.0
+Copyright (C) 2015 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: Richard Cheung, Mcgill, LIC=----
+ 
+Tool Versions:
+Toolchain:       MDK-Lite  Version: 5.17
+Toolchain Path:  Z:\Keil_core\ARM\ARMCC\Bin
+C Compiler:      Armcc.exe V5.06 update 1 (build 61)
+Assembler:       Armasm.exe V5.06 update 1 (build 61)
+Linker/Locator:  ArmLink.exe V5.06 update 1 (build 61)
+Library Manager: ArmAr.exe V5.06 update 1 (build 61)
+Hex Converter:   FromElf.exe V5.06 update 1 (build 61)
+CPU DLL:         SARMCM3.DLL V5.17
+Dialog DLL:      DCM.DLL V1.13.4.0
+Target DLL:      UL2CM3.DLL V1.156.1.0
+Dialog DLL:      TCM.DLL V1.14.6.0
+ 
+<h2>Project:</h2>
+D:\ECSE426\Lab1_STM32F4\Base_Project.uvprojx
+Project File Date:  01/31/2016
+
+<h2>Output:</h2>
+*** Using Compiler 'V5.06 update 1 (build 61)', folder: 'Z:\Keil_core\ARM\ARMCC\Bin'
+Build target 'Lab 1'
+compiling main.c...
+Sources\main.c(35): error:  #28: expression must have a constant value
+  	float outputArray[Length];
+Sources\main.c(38): error:  #268: declaration may not appear after executable statement in block
+  	kalman_state currentState = {1.0f, 1.0f, 0.0f , 1.0f, 0.0f};
+Sources\main.c(66): warning:  #111-D: statement is unreachable
+  	return 0;
+Sources\main.c: 1 warning, 2 errors
+".\Objects\Base_Project.axf" - 2 Error(s), 1 Warning(s).
+
+<h2>Software Packages used:</h2>
+
+Package Vendor: ARM
+                http://www.keil.com/pack/ARM.CMSIS.4.5.0.pack
+                ARM::CMSIS:DSP:1.4.6
+                CMSIS (Cortex Microcontroller Software Interface Standard)
+   * Component: DSP Version: 1.4.6
+   * Component: CORE Version: 4.3.0
+
+Package Vendor: Keil
+                http://www.keil.com/pack/Keil.STM32F4xx_DFP.2.7.0.pack
+                Keil::Device:Startup:2.4.2
+                STMicroelectronics STM32F4 Series Device Support, Drivers and Examples
+   * Component: Startup Version: 2.4.2
+
+<h2>Collection of Component include folders:</h2>
+  D:\ECSE426\Lab1_STM32F4\RTE
+  Z:\Keil_core\ARM\PACK\ARM\CMSIS\4.5.0\CMSIS\Include
+  Z:\Keil_core\ARM\PACK\Keil\STM32F4xx_DFP\2.7.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include
+
+<h2>Collection of Component Files used:</h2>
+
+   * Component: ARM::CMSIS:DSP:1.4.6
+      Include file:  CMSIS\Include\arm_math.h
+      Library file:  CMSIS\Lib\ARM\arm_cortexM4lf_math.lib
+
+   * Component: ARM::CMSIS:CORE:4.3.0
+
+   * Component: Keil::Device:Startup:2.4.2
+      Include file:  Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h
+      Source file:   MDK\Device\Source\ARM\STM32F40xxx_41xxx_OPT.s
+      Source file:   Drivers\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f407xx.s
+      Source file:   MDK\Device\Source\ARM\STM32F4xx_OTP.s
+      Source file:   Drivers\CMSIS\Device\ST\STM32F4xx\Source\Templates\system_stm32f4xx.c
+Target not created.
+Build Time Elapsed:  00:00:00
+</pre>
+</body>
+</html>

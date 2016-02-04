@@ -1,0 +1,371 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000                 AREA             results, DATA, READWRITE, ALIGN
+=2
+    2 00000000                 EXPORT           output
+    3 00000000                 EXPORT           struct
+    4 00000000         
+    5 00000000 00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+
+
+
+ARM Macro Assembler    Page 2 
+
+
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+
+
+
+ARM Macro Assembler    Page 3 
+
+
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+
+
+
+ARM Macro Assembler    Page 4 
+
+
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 struct  SPACE            600         ;create empty memor
+                                                            y for struct and ou
+                                                            tput
+    6 00000258 00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00 00 
+              00 00    output  SPACE            20
+    7 0000026C         
+    8 0000026C                 AREA             text, CODE, READONLY
+    9 00000000                 IMPORT           Kalmanfilter_asm
+   10 00000000                 EXPORT           test_workbench
+   11 00000000         
+   12 00000000 3DCCCCCD 
+              3E4CCCCD 
+              3E99999A 
+              3ECCCCCD 
+              3F000000 input   DCFS             0.1,0.2,0.3,0.4,0.5 ;create inp
+                                                            ut array of size 5
+   13 00000014         
+   14 00000014         test_workbench
+   15 00000014         
+   16 00000014 F2AF 0018       ADR              R0, input   ;set pointer to inp
+                                                            ut array
+   17 00000018 4908            LDR              R1,=output  ;set pointer to fil
+                                                            tered array
+   18 0000001A 4A09            LDR              R2,=struct  ;set pointer to str
+                                                            uct
+   19 0000001C F04F 0305       LDR              R3,=5       ;set array length
+   20 00000020         
+
+
+
+ARM Macro Assembler    Page 5 
+
+
+   21 00000020         ;initialize values for q,r,x,p,k
+   22 00000020 ED9F 0A08       VLDR.F32         S0, =0.1
+   23 00000024 ED82 0A00       VSTR.F32         S0, [R2]
+   24 00000028 ED82 0A01       VSTR.F32         S0, [R2,#4]
+   25 0000002C ED82 0A03       VSTR.F32         S0, [R2,#12]
+   26 00000030 ED9F 0A05       VLDR.F32         S0, =0.0
+   27 00000034 ED82 0A02       VSTR.F32         S0, [R2,#8]
+   28 00000038         
+   29 00000038         
+   30 00000038 4C04            LDR              R4, =Kalmanfilter_asm
+   31 0000003A 4720            BX               R4
+   32 0000003C         
+   33 0000003C                 END
+              00000000 
+              00000000 
+              3DCCCCCD 
+              00000000 
+              00000000 
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp --apcs=int
+erwork --depend=.\objects\test_workbench.d -o.\objects\test_workbench.o -ID:\EC
+SE426\Lab1_STM32F4\RTE -IZ:\Keil_core\ARM\PACK\ARM\CMSIS\4.5.0\CMSIS\Include -I
+Z:\Keil_core\ARM\PACK\Keil\STM32F4xx_DFP\2.7.0\Drivers\CMSIS\Device\ST\STM32F4x
+x\Include --predefine="__EVAL SETA 1" --predefine="__MICROLIB SETA 1" --predefi
+ne="__UVISION_VERSION SETA 517" --predefine="_RTE_ SETA 1" --predefine="STM32F4
+07xx SETA 1" --list=.\listings\test_workbench.lst Sources\test_workbench.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+output 00000258
+
+Symbol: output
+   Definitions
+      At line 6 in file Sources\test_workbench.s
+   Uses
+      At line 2 in file Sources\test_workbench.s
+      At line 17 in file Sources\test_workbench.s
+
+results 00000000
+
+Symbol: results
+   Definitions
+      At line 1 in file Sources\test_workbench.s
+   Uses
+      None
+Comment: results unused
+struct 00000000
+
+Symbol: struct
+   Definitions
+      At line 5 in file Sources\test_workbench.s
+   Uses
+      At line 3 in file Sources\test_workbench.s
+      At line 18 in file Sources\test_workbench.s
+
+3 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+input 00000000
+
+Symbol: input
+   Definitions
+      At line 12 in file Sources\test_workbench.s
+   Uses
+      At line 16 in file Sources\test_workbench.s
+Comment: input used once
+test_workbench 00000014
+
+Symbol: test_workbench
+   Definitions
+      At line 14 in file Sources\test_workbench.s
+   Uses
+      At line 10 in file Sources\test_workbench.s
+Comment: test_workbench used once
+text 00000000
+
+Symbol: text
+   Definitions
+      At line 8 in file Sources\test_workbench.s
+   Uses
+      None
+Comment: text unused
+3 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+External symbols
+
+Kalmanfilter_asm 00000000
+
+Symbol: Kalmanfilter_asm
+   Definitions
+      At line 9 in file Sources\test_workbench.s
+   Uses
+      At line 30 in file Sources\test_workbench.s
+Comment: Kalmanfilter_asm used once
+1 symbol
+345 symbols in table

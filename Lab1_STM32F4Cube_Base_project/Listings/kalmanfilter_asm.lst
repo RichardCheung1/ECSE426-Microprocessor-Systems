@@ -1,0 +1,107 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000                 AREA             text, CODE, READONLY
+    2 00000000                 EXPORT           Kalmanfilter_asm
+    3 00000000         Kalmanfilter_asm
+    4 00000000         
+    5 00000000         
+    6 00000000         ;LOADS q,r,x,p From Struct
+    7 00000000         ;=======================================
+    8 00000000 ED92 0A00       VLDR.F32         S0, [R2]    ;q
+    9 00000004 EDD2 0A01       VLDR.F32         S1, [R2, #4] ;r
+   10 00000008 ED92 1A02       VLDR.F32         S2, [R2, #8] ;x
+   11 0000000C EDD2 1A03       VLDR.F32         S3, [R2, #12] ;P
+   12 00000010         ;k is S4
+   13 00000010         ;=======================================
+   14 00000010         
+   15 00000010         loop
+   16 00000010 EE71 1A80       VADD.F32         S3, S3, S0  ;p = p + q
+   17 00000014 EE71 2AA0       VADD.F32         S5, S3, S1  ;temp = p + r
+   18 00000018 EE81 2AA2       VDIV.F32         S4, S3, S5  ;k = p / p + r
+   19 0000001C         
+   20 0000001C EDD0 2A00       VLDR.F32         S5, [R0]    ;Loads measurement 
+                                                            value from register
+                                                            
+   21 00000020 F100 0004       ADD              R0,R0,#4    ;increment 4byte of
+                                                            fset
+   22 00000024 EE72 2AC1       VSUB.F32         S5, S5, S2  ;temp = measurement
+                                                             - x
+   23 00000028 EE62 2A22       VMUL.F32         S5, S4, S5  ;temp = k * (measur
+                                                            ement - x)
+   24 0000002C EE31 1A22       VADD.F32         S2, S2, S5  ;x = x + k * (measu
+                                                            rement - x)
+   25 00000030         
+   26 00000030 EEF7 2A00       VLDR.F32         S5, =1.0    ;temp = 1
+   27 00000034 EE72 2AC2       VSUB.F32         S5, S5, S4  ;temp = 1 - k
+   28 00000038 EE62 1AA1       VMUL.F32         S3, S5, S3  ;p = (1 - k) * p
+   29 0000003C         
+   30 0000003C ED81 1A00       VSTR.F32         S2, [R1]    ;store x value to o
+                                                            utput array
+   31 00000040 F101 0104       ADD              R1,R1, #4   ;increment by 4byte
+                                                             offset
+   32 00000044         
+   33 00000044 ED82 0A00       VSTR.F32         S0, [R2]    ;store q
+   34 00000048 EDC2 0A01       VSTR.F32         S1, [R2,#4] ;store r
+   35 0000004C ED82 1A02       VSTR.F32         S2, [R2,#8] ;store x
+   36 00000050 EDC2 1A03       VSTR.F32         S3, [R2,#12] ;store p
+   37 00000054 ED82 2A04       VSTR.F32         S4, [R2,#16] ;store k
+   38 00000058         
+   39 00000058 F1A3 0301       SUB              R3,R3,#1    ;decrements the arr
+                                                            ay length
+   40 0000005C 2B00            CMP              R3,#0       ;check if size of a
+                                                            rray is 0
+   41 0000005E D1D7            BNE              loop        ;branch to loop
+   42 00000060         
+   43 00000060 4770            BX               LR
+   44 00000062         
+   45 00000062                 END
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp --apcs=int
+erwork --depend=.\objects\kalmanfilter_asm.d -o.\objects\kalmanfilter_asm.o -ID
+:\ECSE426\Lab1_STM32F4\RTE -IZ:\Keil_core\ARM\PACK\ARM\CMSIS\4.5.0\CMSIS\Includ
+e -IZ:\Keil_core\ARM\PACK\Keil\STM32F4xx_DFP\2.7.0\Drivers\CMSIS\Device\ST\STM3
+
+
+
+ARM Macro Assembler    Page 2 
+
+
+2F4xx\Include --predefine="__EVAL SETA 1" --predefine="__MICROLIB SETA 1" --pre
+define="__UVISION_VERSION SETA 517" --predefine="_RTE_ SETA 1" --predefine="STM
+32F407xx SETA 1" --list=.\listings\kalmanfilter_asm.lst Sources\Kalmanfilter_as
+m.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+Kalmanfilter_asm 00000000
+
+Symbol: Kalmanfilter_asm
+   Definitions
+      At line 3 in file Sources\Kalmanfilter_asm.s
+   Uses
+      At line 2 in file Sources\Kalmanfilter_asm.s
+Comment: Kalmanfilter_asm used once
+loop 00000010
+
+Symbol: loop
+   Definitions
+      At line 15 in file Sources\Kalmanfilter_asm.s
+   Uses
+      At line 41 in file Sources\Kalmanfilter_asm.s
+Comment: loop used once
+text 00000000
+
+Symbol: text
+   Definitions
+      At line 1 in file Sources\Kalmanfilter_asm.s
+   Uses
+      None
+Comment: text unused
+3 symbols
+339 symbols in table
