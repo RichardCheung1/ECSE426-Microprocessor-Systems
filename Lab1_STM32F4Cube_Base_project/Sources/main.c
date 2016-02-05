@@ -5,7 +5,6 @@ typedef struct stateInfo{
 	float q, r, x, p, k;
 }kalman_state;
 
-
 extern int Kalmanfilter_asm (float* InputArray, float* OutputArray, kalman_state* kstate, int length);
 int Kalmanfilter_C(float* InputArray, float* OutputArray, kalman_state* kstate, int Length);
 void c_sub(float* vector_one, float* vector_two, float* output_vector, int vector_length);
@@ -13,7 +12,7 @@ void c_mean(float* input_vector, int vector_length, float* vector_mean);
 void c_std(float* input_vector, int vector_length, float* vector_std);
 void c_correlate(float* vector_one, float* vector_two, float* vector_correlation, int vector_length);
 void c_conv(float* vector_one, float* vector_two, float* vector_convolution, int vector_length);
-int is_valid(float *ScrA, float *ScrB, int length, float tol, char *errorCode);
+void is_valid(float *ScrA, float *ScrB, int length, float tol, char *errorCode);
 int is_correct(float* actualOutput, float* controlOutput);
 
 int is_correct(float* actualOutput, float* controlOutput)
@@ -67,7 +66,8 @@ void c_std(float* input_vector, int vector_length, float* vector_std)
 	int i;
 	for(i = 0; i < vector_length; i++) 
 	{
-		sumOfSquares += ((input_vector[i]-mean)*(input_vector[i]-mean));
+		float difference = fabsf(input_vector[i] - mean);
+		sumOfSquares += difference*difference;
 	}
 	*vector_std = sqrt(sumOfSquares/vector_length);
 }
@@ -75,20 +75,17 @@ void c_std(float* input_vector, int vector_length, float* vector_std)
 void c_correlate(float* vector_one, float* vector_two, float* vector_correlation, int vector_length)
 {
 	int correlation_length = vector_length + vector_length - 1;
-	int i;
+	int i, kmin, kmax, j;
 	for(i = 0; i < correlation_length; i++) 
 	{
-		int j = 0;
-		for(j = 0; j < vector_length; j++) 
+		vector_correlation[i]=0; 
+		//determine the bounds
+		kmin = (i < vector_length - 1) ? 0 : i - vector_length - 1;
+    kmax = (i < vector_length - 1) ? i : vector_length - 1;
+		
+		for(j = kmin; j <= kmax; j++) 
 		{
-			if((i - j) < 0 || (i - j) >= vector_length) 
-			{
-				vector_correlation[i] = 0;
-			} 
-			else 
-			{
-				vector_correlation[i] = vector_one[j] * vector_two [j - i];
-			}
+				vector_correlation[i] += vector_one[j] * vector_two [vector_length - 1 -(i-j) ];
 		}
 	}
 }
@@ -96,20 +93,17 @@ void c_correlate(float* vector_one, float* vector_two, float* vector_correlation
 void c_conv(float* vector_one, float* vector_two, float* vector_convolution, int vector_length)
 {	
 	int convolution_length = vector_length + vector_length - 1;
-	int i;
+	int i, kmin, kmax, j;
 	for(i = 0; i < convolution_length; i++) 
 	{
-		int j = 0;
-		for(j = 0; j < vector_length; j++) 
+		vector_convolution[i]=0; 
+		
+    kmin = (i >= vector_length - 1) ? i - (vector_length - 1) : 0;
+    kmax = (i < vector_length - 1) ? i : vector_length - 1;
+		
+		for(j = kmin; j <= kmax; j++) 
 		{
-			if((i - j) < 0 || (i - j) >= vector_length) 
-			{
-				vector_convolution[i] = 0;
-			} 
-			else 
-			{
-				vector_convolution[i] = vector_one[j] * vector_two [i - j];
-			}
+			vector_convolution[i] += vector_one[j] * vector_two [i - j];
 		}
 	}
 }
@@ -134,19 +128,21 @@ int Kalmanfilter_C(float* InputArray, float* OutputArray, kalman_state* kstate, 
 }
 
 //checks if Source A and Source B have the same value
-int is_valid(float *ScrA, float *ScrB, int length, float tol, char *errorCode)
+void is_valid(float *ScrA, float *ScrB, int length, float tol, char *errorCode)
 {
-	
+	int failed = 1;
 	for(int i = 0; i < length; i++)
 	{
 		if(ScrA[i] - ScrB[i] > tol || ScrA[i] - ScrB[i] < -tol)
 		{
+			failed = 0;
 			printf("Tests fails at %s with error tolerance %f:<SrcA:%f, SrcB:%f>\n", errorCode, tol,ScrA[i], ScrB[i]);
-			return 0;
 		}
 	}
-	printf("Tests Succeed at %s\n", errorCode);
-	return 1;
+	if (failed) 
+	{
+		printf("Tests Succeed at %s with error tolerance %f\n", errorCode, tol);
+	}
 }
 
 int main()
@@ -205,14 +201,14 @@ int main()
 	float corC[2*length-1];
 	float corCMSIS[2*length-1];
 	arm_correlate_f32 (testVector, length, outputArrayC, length, corCMSIS);
-	//c_correlate(testVector, outputArrayC, corC, 2*length-1);
-	//is_valid(corC, corCMSIS, 2*length-1, errorTolerance, "correlation"); 
+	c_correlate(testVector, outputArrayC, corC, length);
+	is_valid(corC, corCMSIS, 2*length-1, errorTolerance, "correlation"); 
 	
 	//convolution
 	float convC[2*length-1];
 	float convCMSIS[2*length-1];
 	arm_conv_f32 (testVector, length, outputArrayC, length, convCMSIS);
-	c_conv(testVector, outputArrayC, convC, 2*length-1);
+	c_conv(testVector, outputArrayC, convC, length);
 	is_valid(convC, convCMSIS, 2*length-1, errorTolerance, "convolution"); 
 
 	return 0;
