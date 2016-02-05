@@ -188,16 +188,18 @@ Reset_Handler    PROC
         IMPORT  __main
 		IMPORT	test_workbench
 
+				 LDR.W 		R0, =0xE000ED88
+				 ORR 		R1, R1, #(0xF << 20)
+				 STR 		R1, [R0]
+				 DSB
+				 ISB
+
                  ;LDR     R0, =SystemInit
                  ;BLX     R0
                  LDR     R0, =__main
                  BX      R0
 				 
-				 ;LDR.W 		R0, =0xE000ED88
-				 ;ORR 		R1, R1, #(0xF << 20)
-				 ;STR 		R1, [R0]
-				 ;DSB
-				 ;ISB
+	
 				 ;LDR 		R0, =test_workbench
 				 ;BLX 		R0
 				 

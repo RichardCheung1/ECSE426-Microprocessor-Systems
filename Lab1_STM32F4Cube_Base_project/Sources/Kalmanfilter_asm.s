@@ -27,6 +27,8 @@ loop
 	VSUB.F32 S5, S5, S4		;temp = 1 - k
 	VMUL.F32 S3, S5, S3 	;p = (1 - k) * p
 	
+	BVS stop
+	
 	VSTR.F32 S2, [R1]		;store x value to output array
 	ADD	R1,R1, #4	;increment by 4byte offset
 
@@ -35,11 +37,10 @@ loop
 	VSTR.F32 S2, [R2,#8]	;store x
 	VSTR.F32 S3, [R2,#12]	;store p
 	VSTR.F32 S4, [R2,#16]	;store k
-
 	SUB R3,R3,#1		;decrements the array length
 	CMP R3,#0			;check if size of array is 0
 	BNE	loop			;branch to loop
-	
+stop
 	BX LR
 	
 	END
