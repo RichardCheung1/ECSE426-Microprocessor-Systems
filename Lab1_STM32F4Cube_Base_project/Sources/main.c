@@ -145,6 +145,29 @@ void is_valid(float *ScrA, float *ScrB, int length, float tol, char *errorCode)
 	}
 }
 
+void is_valid_relative(float *ScrA, float *ScrB, int length, float errTol, float errRelativeTol, char *errorCode)
+{
+	int failed = 1;
+	for(int i = 0; i < length; i++)
+	{
+		float relativeError; 
+		if(ScrA[i] - ScrB[i] > tol || ScrA[i] - ScrB[i] < -tol)
+		{
+			failed = 0;
+			printf("Relative Tests fails at %s :<SrcA:%f, SrcB:%f>\n", errorCode, ScrA[i], ScrB[i]);
+		}
+
+		relativeError= (SrcB > SrcA) ? fabsf(SrcB-SrcA) / SrcB : fabsf(SrcA-SrcB) / SrcA;
+
+		failed = (relativeError <= errRelativeTol) ? 1:0;
+	}
+	if (failed) 
+	{
+		printf("Relative Tests Succeed" );
+	}
+}
+
+
 int main()
 {
 	//initialize testing array
@@ -171,9 +194,11 @@ int main()
 	//call subroutine Kalmanfilter_asm
 	Kalmanfilter_asm(testVector, outputArrayASM, &currentState, length );
 	//Check for correctness with a error tolerance of 0.000001
-	float errorTolerance = 0.000001f; 
+	float errorTolerance = 0.000001f;
+	float errorPercentage = 0.01; 
 	is_valid(outputArrayC, outputArrayASM, length, errorTolerance, "c vs asm");
-	
+	//is_valid_relative(outputArrayC, outputArrayASM, length, errorTolerance, errorPercentage,"c vs asm");
+
 	float differenceC[length];
 	float differenceCMSIS[length];
 	
@@ -182,13 +207,16 @@ int main()
 	c_sub(testVector, outputArrayC, differenceC, length);
 	
 	is_valid(differenceC, differenceCMSIS, length, errorTolerance, "Difference");
-	
+	//is_valid_relative(differenceC, differenceCMSIS, length, errorTolerance, errorPercentage,"Difference");
+
 	//Mean
 	float meanCMSIS;
 	float meanC; 
 	arm_mean_f32 (differenceCMSIS, length , &meanCMSIS);
 	c_mean(differenceC,length, &meanC); 
 	is_valid(&meanC, &meanCMSIS, 1, errorTolerance, "mean"); 
+	//is_valid_relative(&meanC, &meanCMSIS, 1, errorTolerance, errorPercentage, "mean"); 
+
 	
 	//STD
 	float stdC;
@@ -196,6 +224,8 @@ int main()
 	arm_std_f32 (differenceCMSIS, length, &stdCMSIS);
 	c_std(differenceC, length, &stdC);
 	is_valid(&stdC, &stdCMSIS, 1, errorTolerance, "STD");
+	//is_valid_relative(&stdC, &stdCMSIS, 1, errorTolerance, errorPercentage,"STD");
+
 	
 	//correlation
 	float corC[2*length-1];
@@ -203,6 +233,8 @@ int main()
 	arm_correlate_f32 (testVector, length, outputArrayC, length, corCMSIS);
 	c_correlate(testVector, outputArrayC, corC, length);
 	is_valid(corC, corCMSIS, 2*length-1, errorTolerance, "correlation"); 
+	//is_valid_relative(corC, corCMSIS, 2*length-1, errorTolerance, errorPercentage, "correlation"); 
+
 	
 	//convolution
 	float convC[2*length-1];
@@ -210,6 +242,8 @@ int main()
 	arm_conv_f32 (testVector, length, outputArrayC, length, convCMSIS);
 	c_conv(testVector, outputArrayC, convC, length);
 	is_valid(convC, convCMSIS, 2*length-1, errorTolerance, "convolution"); 
+	//is_valid_relative(convC, convCMSIS, 2*length-1, errorTolerance, errorPercentage, "convolution"); 
+
 
 	return 0;
 }
