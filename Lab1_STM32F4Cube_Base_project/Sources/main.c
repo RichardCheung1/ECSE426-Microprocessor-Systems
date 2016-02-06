@@ -6,40 +6,20 @@ typedef struct stateInfo{
 	float q, r, x, p, k;
 }kalman_state;
 
+//subroutine Kalmanfilter_asm
 extern int Kalmanfilter_asm (float* InputArray, float* OutputArray, kalman_state* kstate, int Length);
-
+//Kalmanfilter_C
 int Kalmanfilter_C(float* InputArray, float* OutputArray, kalman_state* kstate, int Length);
+//functions
 void c_sub(float* vector_one, float* vector_two, float* output_vector, int vector_length);
 void c_mean(float* input_vector, int vector_length, float* vector_mean);
 void c_std(float* input_vector, int vector_length, float* vector_std);
 void c_correlate(float* vector_one, float* vector_two, float* vector_correlation, int vector_length);
 void c_conv(float* vector_one, float* vector_two, float* vector_convolution, int vector_length);
 void is_valid(float *ScrA, float *ScrB, int vector_length, float tol, char *errorCode);
-int is_correct(float* actualOutput, float* controlOutput);
+void is_valid_relative(float *ScrA, float *ScrB, int vector_length, float errTol, float errRelativeTol, char *errorCode);
 
-int is_correct(float* actualOutput, float* controlOutput)
-{	
-	/*int compareLength = (sizeof(actualOutput)/sizeof(float));
-	printf("Check float length: %d\n", compareLength);*/
-
-	//Compare size of the arrays
-	if(sizeof(actualOutput) == sizeof(controlOutput)) 
-	{
-		//Compare each float in the arrays
-		for(int i = 0; i < 10; i++) 
-		{
-			printf("Check output float value: %.9g\n", actualOutput[i]);
-			printf("Check output float value: %.9g\n", controlOutput[i]);
-			//if(actualOutput[i] != controlOutput[i]) return 0;
-		}
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-}
-
+//C implementation difference
 void c_sub(float* vector_one, float* vector_two, float* output_vector, int vector_length)
 {
 	int i;
@@ -48,7 +28,7 @@ void c_sub(float* vector_one, float* vector_two, float* output_vector, int vecto
 		output_vector[i] = vector_one[i] - vector_two[i];
 	}
 }
-
+//C implementation mean
 void c_mean(float* input_vector, int vector_length, float* vector_mean)
 {
 	int i;
@@ -61,19 +41,22 @@ void c_mean(float* input_vector, int vector_length, float* vector_mean)
 	*vector_mean = sum / vector_length;
 }
 
+//C implementation standard deviation
+
 void c_std(float* input_vector, int vector_length, float* vector_std)
 {	
-	float mean, sum, sumOfSquares =0.0;
-	c_mean (input_vector,vector_length, &mean);
-	int i;
-	for(i = 0; i < vector_length; i++) 
-	{
-		float difference = fabsf(input_vector[i] - mean);
-		sum += difference;
-		sumOfSquares += difference*difference;
+	float sumOfSquares = 0;
+	float sum = 0;
+	int i = 0;
+	while (i < length) {
+		sumOfSquares += input_vector[i] * input_vector[i];
+		sum += input_vector[i];
+		i++;
 	}
-	*vector_std = sqrt((sumOfSquares-(sum*sum)/vector_length)/(vector_length-1));
+	arm_sqrt_f32(((sumOfSquares - (sum * sum) / length) / (length - 1)), vector_std);
 }
+
+//C implementation standard correlation
 
 void c_correlate(float* vector_one, float* vector_two, float* vector_correlation, int vector_length)
 {
@@ -83,15 +66,16 @@ void c_correlate(float* vector_one, float* vector_two, float* vector_correlation
 	{
 		vector_correlation[i]=0; 
 		//determine the bounds
-		kmin = (i < vector_length - 1) ? 0 : i - vector_length - 1;
+		kmin = (i <= vector_length - 1) ? 0 : i - vector_length+1;
 		kmax = (i < vector_length - 1) ? i : vector_length - 1;
 		
 		for(j = kmin; j <= kmax; j++) 
 		{
-			vector_correlation[i] += vector_one[j] * vector_two [(vector_length - 1) -(i-j)];
+			vector_correlation[i] += vector_one[j] * vector_two [(vector_length - (i -j) - 1 ) ];
 		}
 	}
 }
+//C implementation convolution
 
 void c_conv(float* vector_one, float* vector_two, float* vector_convolution, int vector_length)
 {	
@@ -111,6 +95,7 @@ void c_conv(float* vector_one, float* vector_two, float* vector_convolution, int
 	}
 }
 
+//C implementation Kalmanfilter
 int Kalmanfilter_C(float* InputArray, float* OutputArray, kalman_state* kstate, int Length)
 {	
 	int i;
@@ -124,8 +109,6 @@ int Kalmanfilter_C(float* InputArray, float* OutputArray, kalman_state* kstate, 
 		}
 		kstate->p = (1-kstate->k) * kstate->p;
 		OutputArray[i] = kstate->x;
-
-		printf("InputValue: %f\t Output: %f\t\n", InputArray[i], OutputArray[i]);
 	}
 	return 0; 
 }
@@ -150,6 +133,7 @@ void is_valid(float *ScrA, float *ScrB, int vector_length, float tol, char *erro
 	}
 }
 
+//same as is_valid but with relative error
 void is_valid_relative(float *ScrA, float *ScrB, int vector_length, float errTol, float errRelativeTol, char *errorCode)
 {
 	int failed = 1;
@@ -208,11 +192,11 @@ int main()
 	//is_valid(outputArrayC, outputArrayASM, length, errorTolerance, "c vs asm");
 	//is_valid_relative(outputArrayC, outputArrayASM, length, errorTolerance, errorPercentage,"c vs asm");
 	int p;
-/*
+
 	for ( p = 0; p < length;  p++ )
 	{
-		printf("OutputASM: %f \n", outputArrayASM[p]); 
-	}*/
+		printf("OutputASM: %f & OutputC %f\n", outputArrayASM[p], outputArrayC[p]); 
+	}
 
 	float differenceC[length];
 	float differenceCMSIS[length];

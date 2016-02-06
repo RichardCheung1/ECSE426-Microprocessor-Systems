@@ -12,7 +12,7 @@ output	SPACE	20
 input	DCFS	0.1,0.2,0.3,0.4,0.5 ;create input array of size 5
 	
 test_workbench
-
+;difference between ADR and LDR is that ADR does not perform the data load 	
 	ADR R0, input			;set pointer to input array
 	LDR R1,=output		;set pointer to filtered array
 	LDR R2,=struct		;set pointer to struct
