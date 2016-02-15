@@ -12,11 +12,17 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
 #include "supporting_functions.h"
+#include "init.c"
 
 /* Private variables ---------------------------------------------------------*/
+ADC_HandleTypeDef ADC1_Handle;
+ADC_InitTypeDef ADC_InitStruct;
+ADC_ChannelConfTypeDef ADC_ChannelStruct; 
+
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config	(void);
+void set_adc_channel (void); 
 
 int main(void)
 {
@@ -26,6 +32,30 @@ int main(void)
 	
   /* Configure the system clock */
   SystemClock_Config();
+	
+	//
+	
+	//set ADC_InitTypeDef parameters
+	ADC_InitStruct.DataAlign = ADC_DATAALIGN_RIGHT;
+	ADC_InitStruct.ClockPrescaler = ADC_CLOCKPRESCALER_PCLK_DIV4; 
+	ADC_InitStruct.Resolution = ADC_RESOLUTION12b; 
+	ADC_InitStruct.ContinuousConvMode = DISABLE; 
+	ADC_InitStruct.DiscontinuousConvMode = DISABLE; 
+	ADC_InitStruct.NbrOfConversion = 1; 
+	ADC_InitStruct.ScanConvMode = DISABLE; 
+	ADC_InitStruct.DMAContinuousRequests = DISABLE; 
+	
+	//set ADC_HandleTypeDef parameters
+	ADC1_Handle.Instance = ADC1 ;
+	
+	//Initialize the ADC1
+	if (HAL_ADC_Init(&ADC1_Handle) != HAL_OK){
+		Error_Handler(ADC_INIT_FAIL);
+	};
+	//set the channel for the ADC 
+	set_adc_channel(); 
+	
+	
 	
 	while (1){
 	}
@@ -75,6 +105,15 @@ void SystemClock_Config(void){
    * @brief A function used to setup the ADC to sample Channel 16
    * @retval None
    */
+void set_adc_channel (void) {
+	
+	//sets ADC_ChannelConfTypeDef parameters
+	ADC_ChannelStruct.Channel = ADC_CHANNEL_16;
+	ADC_ChannelStruct.SamplingTime = ADC_SAMPLETIME_480CYCLES; 
+	ADC_ChannelStruct.Rank = 1;
+	
+	HAL_ADC_ConfigChannel(&ADC1_Handle, &ADC_ChannelStruct); 
+}
 
 #ifdef USE_FULL_ASSERT
 
