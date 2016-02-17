@@ -17,6 +17,13 @@
 /* Constants -----------------------------------------------------------------*/
 #define ALARM_PERIOD	100
 #define VOLTAGE_CONVERSION(x)	(float)(x*(3.0/4096))
+#define OVERHEAT_TEMP	(float)50
+#define ALARM_RESET -1	
+
+/* Structs -------------------------------------------------------------------*/
+typedef struct stateInfo{
+	float q, r, x, p, k;
+}kalman_state;
 
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef ADC1_Handle;
@@ -31,16 +38,20 @@ int tick_count_gbl;
 void SystemClock_Config	(void);
 void set_adc_channel (void);
 
-float get_data_from_sensor (float voltage);
+float get_data_from_sensor (void);
 float filter_sensor_data (float voltage);
 float convert_voltage_to_celcius (float voltage);
 void launch_overheat_alarm (int tick_cnt);
+void reset_overheat_alarm (void);
 
+int Kalmanfilter_C(float measured_voltage, kalman_state* kstate);
+
+/* Private function prototypes -----------------------------------------------*/
 int main(void)
 {
 	//Temp vars
 	float temperature;
-	float filteredTemp;
+	float filteredTemp = 55.0f;
 	
 	//Global 
 	tick_count_gbl = 0;
@@ -64,6 +75,9 @@ int main(void)
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FAST; 
 
+	
+	//initialize GPIO
+	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 	
 	//set ADC_InitTypeDef parameters
 	ADC_InitStruct.DataAlign = ADC_DATAALIGN_RIGHT;
@@ -91,6 +105,7 @@ int main(void)
 		Error_Handler(ADC_INIT_FAIL);
 	}
 	
+<<<<<<< HEAD
 	//initialize GPIO
 	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
@@ -125,15 +140,29 @@ int main(void)
 	HAL_GPIO_WritePin (GPIOA, GPIO_PIN_5, GPIO_PIN_SET);	
 	HAL_GPIO_WritePin (GPIOA, GPIO_PIN_6, GPIO_PIN_SET);	
 	
+=======
+>>>>>>> 7df378ffb754b60292a37e8d4c613ec96f51dc0f
 	while (1){
-		tick_count_gbl++;
 		
+		if(tick_count_gbl > (ALARM_PERIOD*4))
+			tick_count_gbl = 0;
 		
 		if (HAL_ADC_PollForConversion(&ADC1_Handle, (uint32_t) 10000) != HAL_OK) {
 			Error_Handler(ADC_INIT_FAIL);
 		}
 		
+<<<<<<< HEAD
 		launch_overheat_alarm(tick_count_gbl);
+=======
+		if(filteredTemp > OVERHEAT_TEMP) {
+			launch_overheat_alarm(tick_count_gbl);
+		} else {
+			launch_overheat_alarm(ALARM_RESET);
+		}
+		
+		tick_count_gbl++;
+		
+>>>>>>> 7df378ffb754b60292a37e8d4c613ec96f51dc0f
 	}
 }
 
@@ -195,6 +224,7 @@ void set_adc_channel (void) {
    */
 void launch_overheat_alarm (int tick_cnt) {
 	
+<<<<<<< HEAD
 	if(tick_cnt >= 0 && tick_cnt < ALARM_PERIOD) {
 		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_RESET);
 		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
@@ -214,38 +244,95 @@ void launch_overheat_alarm (int tick_cnt) {
 		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
 		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_SET);
 	} //for(i = 0; i < ALARM_PERIOD; i++);
+=======
+	if(tick_cnt == ALARM_RESET) {
+		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15, GPIO_PIN_RESET);
+	} else {
+		if(tick_cnt >= 0 && tick_cnt < ALARM_PERIOD) {
+			HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_15, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_12, GPIO_PIN_SET);
+		} //for(i = 0; i < ALARM_PERIOD; i++);
+		
+		if(tick_cnt >= ALARM_PERIOD && tick_cnt < (ALARM_PERIOD*2)) {
+			HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_12, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_13, GPIO_PIN_SET);
+		} //(i = 0; i < ALARM_PERIOD; i++);
+		
+		if(tick_cnt >= (ALARM_PERIOD*2) && tick_cnt < (ALARM_PERIOD*3)) {
+			HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_13, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_14, GPIO_PIN_SET);
+		}//for(i = 0; i < ALARM_PERIOD; i++);
+		
+		if(tick_cnt >= (ALARM_PERIOD*3) && tick_cnt < (ALARM_PERIOD*4)) {
+			HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_14, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_15, GPIO_PIN_SET);
+		} //for(i = 0; i < ALARM_PERIOD; i++);
+	}
+>>>>>>> 7df378ffb754b60292a37e8d4c613ec96f51dc0f
 }
 
 /**
    * @brief A function used to get the sensor data from ADC
-   * @retval None
+	 * @retval temperature: float containing the temperature value
    */
-float get_data_from_sensor (float voltage) {
+float get_data_from_sensor (void) {
 	
+	float voltage, temperature;
+	
+	//Get the raw data from the internal temperature sensor
 	voltage = HAL_ADC_GetValue(&ADC1_Handle);
 	voltage = VOLTAGE_CONVERSION(voltage);
 	
+	//Filter the sensor data
+	voltage = filter_sensor_data(voltage);
 	
+	//Convert the voltage to celcius
+	temperature = convert_voltage_to_celcius(voltage);
 	
+	return temperature;
 }
 
-float filter_sensor_data (float voltage);
+/**
+   * @brief A function used to filter the sensor data from ADC
+   * @retval None
+   */
+float filter_sensor_data (float voltage) {
+	float filtered_voltage;
+	
+	return filtered_voltage;
+}
 
 /**
    * @brief A function used to convert the sensor data to temperature in celcius
-   * @retval None
+	 * @retval temperature_celcius: float containing the temperature value in celcius
    */
 float convert_voltage_to_celcius (float voltage) {
-	float temp_celcius;
+	float temperature_celcius;
 	
 	/** Temperature(°C) = ((V_SENSE - V_25) / Avg_Slope) + 25
 		* where V_SENSE is voltage read from the internal temp sensor
 		*				V_25 is the reference voltage at 25°C -> 0.76V
 		*				Avg_Slope is the average slope of temperature vs V_SENSE curve -> 2.5mV/°C
 	**/
-	temp_celcius = (((voltage - 0.76f) / 0.0025f) + 25.0f);
+	temperature_celcius = (((voltage - 0.76f) / 0.0025f) + 25.0f);
 	
-	return temp_celcius;
+	return temperature_celcius;
+}
+
+//The following method takes an array of measurements and filters the values using the Kalman Filter
+int Kalmanfilter_C(float measured_voltage, kalman_state* kstate) {	
+	kstate->p = kstate->p + kstate->q;
+	kstate->k = kstate->p / (kstate->p + kstate->r);
+	kstate->x = kstate->x + kstate->k * (measured_voltage-kstate->x);
+
+	//The following conditional checks if kstate->x is not a number
+	if (kstate->x != kstate->x) {
+		printf("An error has occured -NaN value was found"); 
+		return 1;
+	}
+
+	kstate->p = (1-kstate->k) * kstate->p;
+	return 0; 
 }
 
 #ifdef USE_FULL_ASSERT
