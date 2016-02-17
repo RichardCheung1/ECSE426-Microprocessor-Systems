@@ -15,7 +15,7 @@
 #include "init.c"
 
 /* Constants -----------------------------------------------------------------*/
-#define ALARM_PERIOD	15
+#define ALARM_PERIOD	100
 #define VOLTAGE_CONVERSION(x)	(float)(x*(3.0/4096))
 
 /* Private variables ---------------------------------------------------------*/
@@ -51,15 +51,19 @@ int main(void)
 	
   /* Configure the system clock */
   SystemClock_Config();
-	
-	//__HAL_RCC_GPIOD_CLK_ENABLE();
+	//Enable GPIO CLK
+	__HAL_RCC_GPIOD_CLK_ENABLE();
+	__HAL_RCC_GPIOC_CLK_ENABLE();
+	__HAL_RCC_GPIOA_CLK_ENABLE();
+
 	//__HAL_RCC_ADC1_CLK_ENABLE();
 	
-	/* Configure the GPIO struct */
+	/* Configure the GPIO struct for LED */
 	GPIO_InitStruct.Pin = GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15; 
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP; 
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FAST; 
+
 	
 	//set ADC_InitTypeDef parameters
 	ADC_InitStruct.DataAlign = ADC_DATAALIGN_RIGHT;
@@ -89,6 +93,37 @@ int main(void)
 	
 	//initialize GPIO
 	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+	
+	//	Configure GPIOC for the 4 select lines
+	GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
+	GPIO_InitStruct.Pull = GPIO_NOPULL; 
+	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+	
+	//	Configure GPIOA for the segments
+	GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
+	GPIO_InitStruct.Pull = GPIO_NOPULL; 
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+		
+
+	
+	
+	HAL_GPIO_WritePin (GPIOC, GPIO_PIN_0, GPIO_PIN_SET);
+	HAL_GPIO_WritePin (GPIOC, GPIO_PIN_1, GPIO_PIN_SET);	
+	HAL_GPIO_WritePin (GPIOC, GPIO_PIN_2, GPIO_PIN_SET);	
+	HAL_GPIO_WritePin (GPIOC, GPIO_PIN_3, GPIO_PIN_SET);
+	
+	HAL_GPIO_WritePin (GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
+	HAL_GPIO_WritePin (GPIOA, GPIO_PIN_1, GPIO_PIN_SET);	
+	HAL_GPIO_WritePin (GPIOA, GPIO_PIN_2, GPIO_PIN_SET);	
+	HAL_GPIO_WritePin (GPIOA, GPIO_PIN_3, GPIO_PIN_SET);	
+	HAL_GPIO_WritePin (GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
+	HAL_GPIO_WritePin (GPIOA, GPIO_PIN_5, GPIO_PIN_SET);	
+	HAL_GPIO_WritePin (GPIOA, GPIO_PIN_6, GPIO_PIN_SET);	
 	
 	while (1){
 		tick_count_gbl++;
@@ -98,7 +133,7 @@ int main(void)
 			Error_Handler(ADC_INIT_FAIL);
 		}
 		
-		
+		launch_overheat_alarm(tick_count_gbl);
 	}
 }
 
@@ -161,23 +196,23 @@ void set_adc_channel (void) {
 void launch_overheat_alarm (int tick_cnt) {
 	
 	if(tick_cnt >= 0 && tick_cnt < ALARM_PERIOD) {
-		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_15, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_12, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
 	} //for(i = 0; i < ALARM_PERIOD; i++);
 	
 	if(tick_cnt >= ALARM_PERIOD && tick_cnt < (ALARM_PERIOD*2)) {
-		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_12, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_13, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
 	} //(i = 0; i < ALARM_PERIOD; i++);
 	
 	if(tick_cnt >= (ALARM_PERIOD*2) && tick_cnt < (ALARM_PERIOD*3)) {
-		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_13, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_14, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
 	}//for(i = 0; i < ALARM_PERIOD; i++);
 	
 	if(tick_cnt >= (ALARM_PERIOD*3) && tick_cnt < (ALARM_PERIOD*4)) {
-		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_14, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_15, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_SET);
 	} //for(i = 0; i < ALARM_PERIOD; i++);
 }
 
