@@ -18,7 +18,7 @@
 ADC_HandleTypeDef ADC1_Handle;
 ADC_InitTypeDef ADC_InitStruct;
 ADC_ChannelConfTypeDef ADC_ChannelStruct; 
-
+GPIO_InitTypeDef GPIO_InitStruct; 
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config	(void);
@@ -33,7 +33,11 @@ int main(void)
   /* Configure the system clock */
   SystemClock_Config();
 	
-	//
+	//set GPIO_InitStruct parameters
+	GPIO_InitStruct.Pin = GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15; 
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP; 
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FAST; 
 	
 	//set ADC_InitTypeDef parameters
 	ADC_InitStruct.DataAlign = ADC_DATAALIGN_RIGHT;
@@ -55,7 +59,8 @@ int main(void)
 	//set the channel for the ADC 
 	set_adc_channel(); 
 	
-	
+	//initialize GPIO
+	HAL_GPIO_Init( GPIOD, &GPIO_InitStruct); 
 	
 	while (1){
 	}
