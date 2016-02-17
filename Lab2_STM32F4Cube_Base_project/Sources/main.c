@@ -3,9 +3,9 @@
   * File Name          : main.c
   * Description        : A program which showcases ADC and TIM3 under the new firmware
 	                       The ADC
-	* Author						 : Ashraf Suyyagh
+	* Author						 : Richard Cheung, Taha Saifuddin
 	* Version            : 1.0.0
-	* Date							 : January 14th, 2016
+	* Date							 : February 17th, 2016
   ******************************************************************************
   */
 	
@@ -14,18 +14,37 @@
 #include "supporting_functions.h"
 #include "init.c"
 
+/* Constants -----------------------------------------------------------------*/
+#define ALARM_PERIOD	15
+#define VOLTAGE_CONVERSION(x)	(float)(x*(3.0/4096))
+
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef ADC1_Handle;
 ADC_InitTypeDef ADC_InitStruct;
-ADC_ChannelConfTypeDef ADC_ChannelStruct; 
-GPIO_InitTypeDef GPIO_InitStruct; 
+ADC_ChannelConfTypeDef ADC_ChannelStruct;
+GPIO_InitTypeDef GPIO_InitStruct;
+GPIO_TypeDef GPIO_struct;
+
+int tick_count_gbl;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config	(void);
-void set_adc_channel (void); 
+void set_adc_channel (void);
+
+float get_data_from_sensor (float voltage);
+float filter_sensor_data (float voltage);
+float convert_voltage_to_celcius (float voltage);
+void launch_overheat_alarm (int tick_cnt);
 
 int main(void)
 {
+	//Temp vars
+	float temperature;
+	float filteredTemp;
+	
+	//Global 
+	tick_count_gbl = 0;
+	
   /* MCU Configuration----------------------------------------------------------*/
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
@@ -33,7 +52,10 @@ int main(void)
   /* Configure the system clock */
   SystemClock_Config();
 	
-	//set GPIO_InitStruct parameters
+	//__HAL_RCC_GPIOD_CLK_ENABLE();
+	//__HAL_RCC_ADC1_CLK_ENABLE();
+	
+	/* Configure the GPIO struct */
 	GPIO_InitStruct.Pin = GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15; 
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP; 
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -42,7 +64,7 @@ int main(void)
 	//set ADC_InitTypeDef parameters
 	ADC_InitStruct.DataAlign = ADC_DATAALIGN_RIGHT;
 	ADC_InitStruct.ClockPrescaler = ADC_CLOCKPRESCALER_PCLK_DIV4; 
-	ADC_InitStruct.Resolution = ADC_RESOLUTION12b; 
+	ADC_InitStruct.Resolution = ADC_RESOLUTION_12B; 
 	ADC_InitStruct.ContinuousConvMode = DISABLE; 
 	ADC_InitStruct.DiscontinuousConvMode = DISABLE; 
 	ADC_InitStruct.NbrOfConversion = 1; 
@@ -55,18 +77,30 @@ int main(void)
 	//Initialize the ADC1
 	if (HAL_ADC_Init(&ADC1_Handle) != HAL_OK){
 		Error_Handler(ADC_INIT_FAIL);
-	};
+	}
+	
 	//set the channel for the ADC 
 	set_adc_channel(); 
 	
+	/* Setting up polling */
+	if (HAL_ADC_Start(&ADC1_Handle) != HAL_OK) {
+		Error_Handler(ADC_INIT_FAIL);
+	}
+	
 	//initialize GPIO
-	HAL_GPIO_Init( GPIOD, &GPIO_InitStruct); 
+	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 	
 	while (1){
+		tick_count_gbl++;
+		
+		
+		if (HAL_ADC_PollForConversion(&ADC1_Handle, (uint32_t) 10000) != HAL_OK) {
+			Error_Handler(ADC_INIT_FAIL);
+		}
+		
+		
 	}
 }
-
-
 
 /** System Clock Configuration */
 void SystemClock_Config(void){
@@ -115,9 +149,68 @@ void set_adc_channel (void) {
 	//sets ADC_ChannelConfTypeDef parameters
 	ADC_ChannelStruct.Channel = ADC_CHANNEL_16;
 	ADC_ChannelStruct.SamplingTime = ADC_SAMPLETIME_480CYCLES; 
-	ADC_ChannelStruct.Rank = 1;
+	//ADC_ChannelStruct.Rank = 1;
 	
 	HAL_ADC_ConfigChannel(&ADC1_Handle, &ADC_ChannelStruct); 
+}
+
+/**
+   * @brief A function used to dictate the rotation of the LED alarm when the processor overheats
+   * @retval None
+   */
+void launch_overheat_alarm (int tick_cnt) {
+	
+	if(tick_cnt >= 0 && tick_cnt < ALARM_PERIOD) {
+		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_15, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_12, GPIO_PIN_SET);
+	} //for(i = 0; i < ALARM_PERIOD; i++);
+	
+	if(tick_cnt >= ALARM_PERIOD && tick_cnt < (ALARM_PERIOD*2)) {
+		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_12, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_13, GPIO_PIN_SET);
+	} //(i = 0; i < ALARM_PERIOD; i++);
+	
+	if(tick_cnt >= (ALARM_PERIOD*2) && tick_cnt < (ALARM_PERIOD*3)) {
+		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_13, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_14, GPIO_PIN_SET);
+	}//for(i = 0; i < ALARM_PERIOD; i++);
+	
+	if(tick_cnt >= (ALARM_PERIOD*3) && tick_cnt < (ALARM_PERIOD*4)) {
+		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_14, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_15, GPIO_PIN_SET);
+	} //for(i = 0; i < ALARM_PERIOD; i++);
+}
+
+/**
+   * @brief A function used to get the sensor data from ADC
+   * @retval None
+   */
+float get_data_from_sensor (float voltage) {
+	
+	voltage = HAL_ADC_GetValue(&ADC1_Handle);
+	voltage = VOLTAGE_CONVERSION(voltage);
+	
+	
+	
+}
+
+float filter_sensor_data (float voltage);
+
+/**
+   * @brief A function used to convert the sensor data to temperature in celcius
+   * @retval None
+   */
+float convert_voltage_to_celcius (float voltage) {
+	float temp_celcius;
+	
+	/** Temperature(°C) = ((V_SENSE - V_25) / Avg_Slope) + 25
+		* where V_SENSE is voltage read from the internal temp sensor
+		*				V_25 is the reference voltage at 25°C -> 0.76V
+		*				Avg_Slope is the average slope of temperature vs V_SENSE curve -> 2.5mV/°C
+	**/
+	temp_celcius = (((voltage - 0.76f) / 0.0025f) + 25.0f);
+	
+	return temp_celcius;
 }
 
 #ifdef USE_FULL_ASSERT
