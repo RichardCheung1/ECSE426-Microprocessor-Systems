@@ -46,6 +46,9 @@ void Error_Handler			(uint16_t error_code){
 		case EXTI_SPI1_FAIL: 
 			printf("ERROR: Error in initialising SPI1 \n");
 			break;
+		case ADC_TEST:
+			printf("IT FAILS HERE\n");
+			break;
 		default: printf ("ERROR: AN ERROR OCCURED \n");
 		break;
 	}

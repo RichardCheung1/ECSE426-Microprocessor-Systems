@@ -15,8 +15,8 @@
 #include "init.c"
 
 /* Constants -----------------------------------------------------------------*/
-#define ALARM_PERIOD	100
-#define VOLTAGE_CONVERSION(x)	(float)(x*(3.0/4096))
+#define ALARM_PERIOD	500
+//#define VOLTAGE_CONVERSION(x)	(float)(x*(3.0/4096))
 #define OVERHEAT_TEMP	(float)50
 #define ALARM_RESET -1	
 
@@ -53,6 +53,9 @@ int main(void)
 	float temperature;
 	float filteredTemp = 55.0f;
 	
+	//Temp delay var
+	int i = 0;
+	
 	//Global 
 	tick_count_gbl = 0;
 	
@@ -62,12 +65,13 @@ int main(void)
 	
   /* Configure the system clock */
   SystemClock_Config();
+	
 	//Enable GPIO CLK
 	__HAL_RCC_GPIOD_CLK_ENABLE();
 	__HAL_RCC_GPIOC_CLK_ENABLE();
 	__HAL_RCC_GPIOA_CLK_ENABLE();
 
-	//__HAL_RCC_ADC1_CLK_ENABLE();
+	
 	
 	/* Configure the GPIO struct for LED */
 	GPIO_InitStruct.Pin = GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15; 
@@ -91,7 +95,7 @@ int main(void)
 	
 	//set ADC_HandleTypeDef parameters
 	ADC1_Handle.Instance = ADC1 ;
-	
+	__HAL_RCC_ADC1_CLK_ENABLE();
 	//Initialize the ADC1
 	if (HAL_ADC_Init(&ADC1_Handle) != HAL_OK){
 		Error_Handler(ADC_INIT_FAIL);
@@ -104,11 +108,6 @@ int main(void)
 	if (HAL_ADC_Start(&ADC1_Handle) != HAL_OK) {
 		Error_Handler(ADC_INIT_FAIL);
 	}
-	
-<<<<<<< HEAD
-	//initialize GPIO
-	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
-
 	
 	//	Configure GPIOC for the 4 select lines
 	GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3;
@@ -123,9 +122,6 @@ int main(void)
 	GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
 	GPIO_InitStruct.Pull = GPIO_NOPULL; 
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-		
-
-	
 	
 	HAL_GPIO_WritePin (GPIOC, GPIO_PIN_0, GPIO_PIN_SET);
 	HAL_GPIO_WritePin (GPIOC, GPIO_PIN_1, GPIO_PIN_SET);	
@@ -140,20 +136,23 @@ int main(void)
 	HAL_GPIO_WritePin (GPIOA, GPIO_PIN_5, GPIO_PIN_SET);	
 	HAL_GPIO_WritePin (GPIOA, GPIO_PIN_6, GPIO_PIN_SET);	
 	
-=======
->>>>>>> 7df378ffb754b60292a37e8d4c613ec96f51dc0f
+	//temperature = get_data_from_sensor();
 	while (1){
 		
-		if(tick_count_gbl > (ALARM_PERIOD*4))
+		printf("The tick count is %d\n", tick_count_gbl);
+		
+		if(tick_count_gbl >= (ALARM_PERIOD*4))
 			tick_count_gbl = 0;
 		
-		if (HAL_ADC_PollForConversion(&ADC1_Handle, (uint32_t) 10000) != HAL_OK) {
-			Error_Handler(ADC_INIT_FAIL);
+		if (HAL_ADC_PollForConversion(&ADC1_Handle, 10) == HAL_OK) {
+			temperature = HAL_ADC_GetValue(&ADC1_Handle);
+			//get_data_from_sensor();
+		} else {
+			printf("%d\n", HAL_ADC_PollForConversion(&ADC1_Handle, 10));
+			printf("Error in conversion\n");
+			//Error_Handler(ADC_INIT_FAIL);
 		}
 		
-<<<<<<< HEAD
-		launch_overheat_alarm(tick_count_gbl);
-=======
 		if(filteredTemp > OVERHEAT_TEMP) {
 			launch_overheat_alarm(tick_count_gbl);
 		} else {
@@ -161,8 +160,6 @@ int main(void)
 		}
 		
 		tick_count_gbl++;
-		
->>>>>>> 7df378ffb754b60292a37e8d4c613ec96f51dc0f
 	}
 }
 
@@ -223,52 +220,34 @@ void set_adc_channel (void) {
    * @retval None
    */
 void launch_overheat_alarm (int tick_cnt) {
-	
-<<<<<<< HEAD
-	if(tick_cnt >= 0 && tick_cnt < ALARM_PERIOD) {
-		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
-	} //for(i = 0; i < ALARM_PERIOD; i++);
-	
-	if(tick_cnt >= ALARM_PERIOD && tick_cnt < (ALARM_PERIOD*2)) {
-		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
-	} //(i = 0; i < ALARM_PERIOD; i++);
-	
-	if(tick_cnt >= (ALARM_PERIOD*2) && tick_cnt < (ALARM_PERIOD*3)) {
-		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
-	}//for(i = 0; i < ALARM_PERIOD; i++);
-	
-	if(tick_cnt >= (ALARM_PERIOD*3) && tick_cnt < (ALARM_PERIOD*4)) {
-		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_SET);
-	} //for(i = 0; i < ALARM_PERIOD; i++);
-=======
+
 	if(tick_cnt == ALARM_RESET) {
 		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15, GPIO_PIN_RESET);
 	} else {
 		if(tick_cnt >= 0 && tick_cnt < ALARM_PERIOD) {
-			HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_15, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_12, GPIO_PIN_SET);
+			printf("LED 1\n");
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
 		} //for(i = 0; i < ALARM_PERIOD; i++);
 		
 		if(tick_cnt >= ALARM_PERIOD && tick_cnt < (ALARM_PERIOD*2)) {
-			HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_12, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_13, GPIO_PIN_SET);
+			printf("LED 2\n");
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
 		} //(i = 0; i < ALARM_PERIOD; i++);
 		
 		if(tick_cnt >= (ALARM_PERIOD*2) && tick_cnt < (ALARM_PERIOD*3)) {
-			HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_13, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_14, GPIO_PIN_SET);
+			printf("LED 3\n");
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
 		}//for(i = 0; i < ALARM_PERIOD; i++);
 		
 		if(tick_cnt >= (ALARM_PERIOD*3) && tick_cnt < (ALARM_PERIOD*4)) {
-			HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_14, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_15, GPIO_PIN_SET);
+			printf("LED 4\n");
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_SET);
 		} //for(i = 0; i < ALARM_PERIOD; i++);
 	}
->>>>>>> 7df378ffb754b60292a37e8d4c613ec96f51dc0f
 }
 
 /**
@@ -277,18 +256,21 @@ void launch_overheat_alarm (int tick_cnt) {
    */
 float get_data_from_sensor (void) {
 	
-	float voltage, temperature;
+	int voltage;
+	float temperature;
 	
 	//Get the raw data from the internal temperature sensor
 	voltage = HAL_ADC_GetValue(&ADC1_Handle);
-	voltage = VOLTAGE_CONVERSION(voltage);
+	printf("The voltage from sensor is %d\n", voltage);
+	voltage = (3*voltage) / 4096;
 	
 	//Filter the sensor data
-	voltage = filter_sensor_data(voltage);
+	//voltage = filter_sensor_data(voltage);
 	
 	//Convert the voltage to celcius
 	temperature = convert_voltage_to_celcius(voltage);
 	
+	printf("The unfiltered temperature is %f\n", temperature);
 	return temperature;
 }
 
