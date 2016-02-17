@@ -17,6 +17,8 @@
 /* Constants -----------------------------------------------------------------*/
 #define ALARM_PERIOD	15
 #define VOLTAGE_CONVERSION(x)	(float)(x*(3.0/4096))
+#define OVERHEAT_TEMP	(float)50
+#define ALARM_RESET -1	
 
 /* Structs -------------------------------------------------------------------*/
 typedef struct stateInfo{
@@ -40,6 +42,7 @@ float get_data_from_sensor (void);
 float filter_sensor_data (float voltage);
 float convert_voltage_to_celcius (float voltage);
 void launch_overheat_alarm (int tick_cnt);
+void reset_overheat_alarm (void);
 
 int Kalmanfilter_C(float measured_voltage, kalman_state* kstate);
 
@@ -48,7 +51,7 @@ int main(void)
 {
 	//Temp vars
 	float temperature;
-	float filteredTemp;
+	float filteredTemp = 55.0f;
 	
 	//Global 
 	tick_count_gbl = 0;
@@ -68,6 +71,9 @@ int main(void)
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP; 
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FAST; 
+	
+	//initialize GPIO
+	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 	
 	//set ADC_InitTypeDef parameters
 	ADC_InitStruct.DataAlign = ADC_DATAALIGN_RIGHT;
@@ -95,17 +101,22 @@ int main(void)
 		Error_Handler(ADC_INIT_FAIL);
 	}
 	
-	//initialize GPIO
-	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
-	
 	while (1){
-		tick_count_gbl++;
 		
+		if(tick_count_gbl > (ALARM_PERIOD*4))
+			tick_count_gbl = 0;
 		
 		if (HAL_ADC_PollForConversion(&ADC1_Handle, (uint32_t) 10000) != HAL_OK) {
 			Error_Handler(ADC_INIT_FAIL);
 		}
 		
+		if(filteredTemp > OVERHEAT_TEMP) {
+			launch_overheat_alarm(tick_count_gbl);
+		} else {
+			launch_overheat_alarm(ALARM_RESET);
+		}
+		
+		tick_count_gbl++;
 		
 	}
 }
@@ -168,25 +179,29 @@ void set_adc_channel (void) {
    */
 void launch_overheat_alarm (int tick_cnt) {
 	
-	if(tick_cnt >= 0 && tick_cnt < ALARM_PERIOD) {
-		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_15, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_12, GPIO_PIN_SET);
-	} //for(i = 0; i < ALARM_PERIOD; i++);
-	
-	if(tick_cnt >= ALARM_PERIOD && tick_cnt < (ALARM_PERIOD*2)) {
-		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_12, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_13, GPIO_PIN_SET);
-	} //(i = 0; i < ALARM_PERIOD; i++);
-	
-	if(tick_cnt >= (ALARM_PERIOD*2) && tick_cnt < (ALARM_PERIOD*3)) {
-		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_13, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_14, GPIO_PIN_SET);
-	}//for(i = 0; i < ALARM_PERIOD; i++);
-	
-	if(tick_cnt >= (ALARM_PERIOD*3) && tick_cnt < (ALARM_PERIOD*4)) {
-		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_14, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_15, GPIO_PIN_SET);
-	} //for(i = 0; i < ALARM_PERIOD; i++);
+	if(tick_cnt == ALARM_RESET) {
+		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15, GPIO_PIN_RESET);
+	} else {
+		if(tick_cnt >= 0 && tick_cnt < ALARM_PERIOD) {
+			HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_15, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_12, GPIO_PIN_SET);
+		} //for(i = 0; i < ALARM_PERIOD; i++);
+		
+		if(tick_cnt >= ALARM_PERIOD && tick_cnt < (ALARM_PERIOD*2)) {
+			HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_12, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_13, GPIO_PIN_SET);
+		} //(i = 0; i < ALARM_PERIOD; i++);
+		
+		if(tick_cnt >= (ALARM_PERIOD*2) && tick_cnt < (ALARM_PERIOD*3)) {
+			HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_13, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_14, GPIO_PIN_SET);
+		}//for(i = 0; i < ALARM_PERIOD; i++);
+		
+		if(tick_cnt >= (ALARM_PERIOD*3) && tick_cnt < (ALARM_PERIOD*4)) {
+			HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_14, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_15, GPIO_PIN_SET);
+		} //for(i = 0; i < ALARM_PERIOD; i++);
+	}
 }
 
 /**
@@ -238,8 +253,7 @@ float convert_voltage_to_celcius (float voltage) {
 }
 
 //The following method takes an array of measurements and filters the values using the Kalman Filter
-int Kalmanfilter_C(float measured_voltage, kalman_state* kstate,)
-{	
+int Kalmanfilter_C(float measured_voltage, kalman_state* kstate) {	
 	kstate->p = kstate->p + kstate->q;
 	kstate->k = kstate->p / (kstate->p + kstate->r);
 	kstate->x = kstate->x + kstate->k * (measured_voltage-kstate->x);
