@@ -18,6 +18,11 @@
 #define ALARM_PERIOD	15
 #define VOLTAGE_CONVERSION(x)	(float)(x*(3.0/4096))
 
+/* Structs -------------------------------------------------------------------*/
+typedef struct stateInfo{
+	float q, r, x, p, k;
+}kalman_state;
+
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef ADC1_Handle;
 ADC_InitTypeDef ADC_InitStruct;
@@ -31,11 +36,14 @@ int tick_count_gbl;
 void SystemClock_Config	(void);
 void set_adc_channel (void);
 
-float get_data_from_sensor (float voltage);
+float get_data_from_sensor (void);
 float filter_sensor_data (float voltage);
 float convert_voltage_to_celcius (float voltage);
 void launch_overheat_alarm (int tick_cnt);
 
+int Kalmanfilter_C(float measured_voltage, kalman_state* kstate);
+
+/* Private function prototypes -----------------------------------------------*/
 int main(void)
 {
 	//Temp vars
@@ -183,34 +191,67 @@ void launch_overheat_alarm (int tick_cnt) {
 
 /**
    * @brief A function used to get the sensor data from ADC
-   * @retval None
+	 * @retval temperature: float containing the temperature value
    */
-float get_data_from_sensor (float voltage) {
+float get_data_from_sensor (void) {
 	
+	float voltage, temperature;
+	
+	//Get the raw data from the internal temperature sensor
 	voltage = HAL_ADC_GetValue(&ADC1_Handle);
 	voltage = VOLTAGE_CONVERSION(voltage);
 	
+	//Filter the sensor data
+	voltage = filter_sensor_data(voltage);
 	
+	//Convert the voltage to celcius
+	temperature = convert_voltage_to_celcius(voltage);
 	
+	return temperature;
 }
 
-float filter_sensor_data (float voltage);
+/**
+   * @brief A function used to filter the sensor data from ADC
+   * @retval None
+   */
+float filter_sensor_data (float voltage) {
+	float filtered_voltage;
+	
+	return filtered_voltage;
+}
 
 /**
    * @brief A function used to convert the sensor data to temperature in celcius
-   * @retval None
+	 * @retval temperature_celcius: float containing the temperature value in celcius
    */
 float convert_voltage_to_celcius (float voltage) {
-	float temp_celcius;
+	float temperature_celcius;
 	
 	/** Temperature(°C) = ((V_SENSE - V_25) / Avg_Slope) + 25
 		* where V_SENSE is voltage read from the internal temp sensor
 		*				V_25 is the reference voltage at 25°C -> 0.76V
 		*				Avg_Slope is the average slope of temperature vs V_SENSE curve -> 2.5mV/°C
 	**/
-	temp_celcius = (((voltage - 0.76f) / 0.0025f) + 25.0f);
+	temperature_celcius = (((voltage - 0.76f) / 0.0025f) + 25.0f);
 	
-	return temp_celcius;
+	return temperature_celcius;
+}
+
+//The following method takes an array of measurements and filters the values using the Kalman Filter
+int Kalmanfilter_C(float measured_voltage, kalman_state* kstate,)
+{	
+	kstate->p = kstate->p + kstate->q;
+	kstate->k = kstate->p / (kstate->p + kstate->r);
+	kstate->x = kstate->x + kstate->k * (measured_voltage-kstate->x);
+
+	//The following conditional checks if kstate->x is not a number
+	if (kstate->x != kstate->x) {
+		printf("An error has occured -NaN value was found"); 
+		return 1;
+	}
+
+	kstate->p = (1-kstate->k) * kstate->p;
+	return 0; 
 }
 
 #ifdef USE_FULL_ASSERT
