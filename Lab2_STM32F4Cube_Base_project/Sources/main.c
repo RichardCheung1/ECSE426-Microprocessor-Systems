@@ -71,7 +71,7 @@ int main(void)
 	__HAL_RCC_GPIOC_CLK_ENABLE();
 	__HAL_RCC_GPIOA_CLK_ENABLE();
 
-	
+	__HAL_RCC_ADC1_CLK_ENABLE();
 	
 	/* Configure the GPIO struct for LED */
 	GPIO_InitStruct.Pin = GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15; 
@@ -83,19 +83,21 @@ int main(void)
 	//initialize GPIO
 	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 	
+	ADC1_Handle.Instance = ADC1 ;
+
 	//set ADC_InitTypeDef parameters
 	ADC_InitStruct.DataAlign = ADC_DATAALIGN_RIGHT;
 	ADC_InitStruct.ClockPrescaler = ADC_CLOCKPRESCALER_PCLK_DIV4; 
 	ADC_InitStruct.Resolution = ADC_RESOLUTION_12B; 
-	ADC_InitStruct.ContinuousConvMode = DISABLE; 
+	ADC_InitStruct.ContinuousConvMode = ENABLE; 
 	ADC_InitStruct.DiscontinuousConvMode = DISABLE; 
 	ADC_InitStruct.NbrOfConversion = 1; 
 	ADC_InitStruct.ScanConvMode = DISABLE; 
 	ADC_InitStruct.DMAContinuousRequests = DISABLE; 
 	
 	//set ADC_HandleTypeDef parameters
-	ADC1_Handle.Instance = ADC1 ;
-	__HAL_RCC_ADC1_CLK_ENABLE();
+	ADC1_Handle.Init = ADC_InitStruct; 
+
 	//Initialize the ADC1
 	if (HAL_ADC_Init(&ADC1_Handle) != HAL_OK){
 		Error_Handler(ADC_INIT_FAIL);
@@ -144,13 +146,9 @@ int main(void)
 		if(tick_count_gbl >= (ALARM_PERIOD*4))
 			tick_count_gbl = 0;
 		
-		if (HAL_ADC_PollForConversion(&ADC1_Handle, 10) == HAL_OK) {
-			temperature = HAL_ADC_GetValue(&ADC1_Handle);
-			//get_data_from_sensor();
-		} else {
-			printf("%d\n", HAL_ADC_PollForConversion(&ADC1_Handle, 10));
-			printf("Error in conversion\n");
-			//Error_Handler(ADC_INIT_FAIL);
+		if (HAL_ADC_PollForConversion(&ADC1_Handle, 1000000) == HAL_OK) {
+			//temperature = HAL_ADC_GetValue(&ADC1_Handle);
+			get_data_from_sensor();
 		}
 		
 		if(filteredTemp > OVERHEAT_TEMP) {
@@ -210,9 +208,13 @@ void set_adc_channel (void) {
 	//sets ADC_ChannelConfTypeDef parameters
 	ADC_ChannelStruct.Channel = ADC_CHANNEL_16;
 	ADC_ChannelStruct.SamplingTime = ADC_SAMPLETIME_480CYCLES; 
-	//ADC_ChannelStruct.Rank = 1;
+	ADC_ChannelStruct.Rank = 1;
+	ADC_ChannelStruct.Offset = 0;
 	
-	HAL_ADC_ConfigChannel(&ADC1_Handle, &ADC_ChannelStruct); 
+	if (HAL_ADC_ConfigChannel(&ADC1_Handle, &ADC_ChannelStruct) != HAL_OK )
+	{
+		Error_Handler(ADC_CH_CONFIG_FAIL);
+	}		
 }
 
 /**
@@ -256,12 +258,12 @@ void launch_overheat_alarm (int tick_cnt) {
    */
 float get_data_from_sensor (void) {
 	
-	int voltage;
+	float voltage;
 	float temperature;
 	
 	//Get the raw data from the internal temperature sensor
 	voltage = HAL_ADC_GetValue(&ADC1_Handle);
-	printf("The voltage from sensor is %d\n", voltage);
+	printf("The voltage from sensor is %f\n", voltage);
 	voltage = (3*voltage) / 4096;
 	
 	//Filter the sensor data
