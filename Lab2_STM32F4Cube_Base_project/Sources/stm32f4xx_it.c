@@ -161,6 +161,7 @@ void SysTick_Handler(void)
 		if (HAL_ADC_PollForConversion(&ADC1_Handle, 1000000) == HAL_OK) {
 			get_data_from_sensor();
 		}
+		tick_count_gbl++;
 }
 
 /******************************************************************************/

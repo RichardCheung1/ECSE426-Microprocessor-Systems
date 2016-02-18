@@ -442,6 +442,11 @@
               <FileType>1</FileType>
               <FilePath>.\Sources\init.c</FilePath>
             </File>
+            <File>
+              <FileName>segment_display.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\segment_display.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -461,6 +466,11 @@
               <FileName>supporting_functions.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Headers\supporting_functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>segment_display.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\segment_display.h</FilePath>
             </File>
           </Files>
         </Group>
