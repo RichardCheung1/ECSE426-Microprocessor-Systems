@@ -12,6 +12,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
 #include "supporting_functions.h"
+#include "main.h"
 #include "init.c"
 
 /* Constants -----------------------------------------------------------------*/
@@ -26,11 +27,11 @@ typedef struct stateInfo{
 }kalman_state;
 
 /* Private variables ---------------------------------------------------------*/
-ADC_HandleTypeDef ADC1_Handle;
 ADC_InitTypeDef ADC_InitStruct;
 ADC_ChannelConfTypeDef ADC_ChannelStruct;
 GPIO_InitTypeDef GPIO_InitStruct;
 GPIO_TypeDef GPIO_struct;
+ADC_HandleTypeDef ADC1_Handle;
 
 int tick_count_gbl;
 
@@ -38,11 +39,13 @@ int tick_count_gbl;
 void SystemClock_Config	(void);
 void set_adc_channel (void);
 
-float get_data_from_sensor (void);
+float get_data_from_sensor(void);
 float filter_sensor_data (float voltage);
 float convert_voltage_to_celcius (float voltage);
 void launch_overheat_alarm (int tick_cnt);
 void reset_overheat_alarm (void);
+void set_segment_display(char* c);
+
 
 int Kalmanfilter_C(float measured_voltage, kalman_state* kstate);
 
@@ -151,10 +154,7 @@ int main(void)
 		if(tick_count_gbl >= (ALARM_PERIOD*4))
 			tick_count_gbl = 0;
 		
-		if (HAL_ADC_PollForConversion(&ADC1_Handle, 1000000) == HAL_OK) {
-			//temperature = HAL_ADC_GetValue(&ADC1_Handle);
-			get_data_from_sensor();
-		}
+
 		
 		if(filteredTemp > OVERHEAT_TEMP) {
 			launch_overheat_alarm(tick_count_gbl);
@@ -165,6 +165,12 @@ int main(void)
 		tick_count_gbl++;
 	}
 }
+
+void set_segment_display(char* c)
+{
+	
+}
+
 
 /** System Clock Configuration */
 void SystemClock_Config(void){

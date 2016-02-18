@@ -43,9 +43,12 @@
 #include "stm32f4xx_hal.h"
 
 /* Exported types ------------------------------------------------------------*/
+extern ADC_HandleTypeDef ADC1_Handle;
+
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
+extern float get_data_from_sensor(void);
 
 #endif /* __MAIN_H */
 
