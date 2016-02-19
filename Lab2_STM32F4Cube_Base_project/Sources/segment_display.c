@@ -27,56 +27,69 @@ void LCD_init(void)
 {
 	int i ;
 	//reset all pins
-	HAL_GPIO_WritePin( GPIOE,  GPIO_PIN_7 | GPIO_PIN_8  | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14, GPIO_PIN_RESET); 
-	//Clear display
-	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
+	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_0| GPIO_PIN_1| GPIO_PIN_2 | GPIO_PIN_7 | GPIO_PIN_8  | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14, GPIO_PIN_RESET); 
 	
-	// delay
-	for ( i =0; i < 500 ; i++ ){}
+	//Clear display
+	LCD_clear_display();
+	
 	//Display & cursor HOME
 	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_8, GPIO_PIN_SET);
+	LCD_set_enable();
 
-	// delay
-	for ( i =0; i < 500 ; i++ ){}
 	//Character Entry Mode
 	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_9 , GPIO_PIN_SET);
-	// delay
-	for ( i =0; i < 500 ; i++ ){}
+	LCD_set_enable();
 
 	// display ON
 	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_10 , GPIO_PIN_SET); 
-	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_7 | GPIO_PIN_8 , GPIO_PIN_RESET);
-	// delay
-	for ( i =0; i < 500 ; i++ ){}
+	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_8 , GPIO_PIN_RESET);
+	LCD_set_enable();
 
 	//display cursor Shift
 	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_11 , GPIO_PIN_SET); 
-	// delay
-	for ( i =0; i < 500 ; i++ ){}
-		
+	LCD_set_enable();
+
 	//function set
 	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_12, GPIO_PIN_SET); 
 	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_10 | GPIO_PIN_9, GPIO_PIN_RESET) ;
+	LCD_set_enable();
 		
-	// delay
-	for ( i =0; i < 500 ; i++ ){}
+
 }
 
+void LCD_set_enable (void)
+{
+	int i; 
+	Set_En;
+	// delay
+	for ( i =0; i < 300 ; i++ ){}
+	Clr_En;
+}
 //function that clear the LCD display
 void LCD_clear_display (void) 
 {
-		int i ;
+	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_7, GPIO_PIN_RESET);
+	LCD_set_enable();
+}
 
-	//reset all pins
-	HAL_GPIO_WritePin( GPIOE,  GPIO_PIN_7 | GPIO_PIN_8  | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14, GPIO_PIN_RESET); 
-	//Clear display
-	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
-	
-	for ( i =0; i < 500 ; i++ ){}
+void LCD_display( float f) 
+{
+	int i;
+	int number = f*10 ;
+	int position = 0;
+
+	LCD_clear_display();
+	LCD_send_char(number %10) ;
 
 }
 
-
+void LCD_send_char (int number) 
+{
+	char c = (char) number; 
+	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_1, GPIO_PIN_SET);
+	LCD_set_enable();
+	
+}
 
 //updates the segment display in the format of XY.Z by using the multiplexing
 void update_segment_display(float f)
