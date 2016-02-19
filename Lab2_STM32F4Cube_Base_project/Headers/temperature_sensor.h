@@ -1,3 +1,13 @@
+/**
+  ******************************************************************************
+  * File Name          : temperature_sensor.h
+  * Description        : Temperature sensor functions that can be used by other classes
+	* Author						 : Taha Saifuddin, Richard Cheung
+	* Version            : 1.0.0
+	* Date							 : February 19th, 2016
+  ******************************************************************************
+  */
+	
 #ifndef TEMPERATURE_SENSOR_H
 #define TEMPERATURE_SENSOR_H
 

@@ -5,7 +5,7 @@
 												 and its conversion to celcius
 	* Author						 : Richard Cheung, Taha Saifuddin
 	* Version            : 1.0.0
-	* Date							 : February 17th, 2016
+	* Date							 : February 19th, 2016
   ******************************************************************************
   */
 

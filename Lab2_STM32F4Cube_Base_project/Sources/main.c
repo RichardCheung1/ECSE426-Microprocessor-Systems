@@ -17,7 +17,7 @@
 /* Constants -----------------------------------------------------------------*/
 #define ALARM_PERIOD	500
 //#define VOLTAGE_CONVERSION(x)	(float)(x*(3.0/4096))
-#define OVERHEAT_TEMP	(float)45
+#define OVERHEAT_TEMP	(float)37.0
 #define ALARM_RESET -1	
 
 /* Private variables ---------------------------------------------------------*/
@@ -36,6 +36,11 @@ int ticks = 0;
 /* Private function implementations ------------------------------------------*/
 int main(void)
 {
+	
+	//testing adc
+	int adc_started = 0;
+	int adc_valid = 0;
+ 	
 	//Variables to store temperature
 	float temperature = 0.0f;
 	float display_temp = 0.0f;
@@ -83,6 +88,8 @@ int main(void)
 	ADC_InitStruct.NbrOfConversion = 1; 
 	ADC_InitStruct.ScanConvMode = DISABLE; 
 	ADC_InitStruct.DMAContinuousRequests = DISABLE; 
+	//ADC_InitStruct.ExternalTrigConv = ADC_SOFTWARE_START;
+	//ADC_InitStruct.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
 	
 	//set ADC_HandleTypeDef parameters
 	ADC1_Handle.Init = ADC_InitStruct; 
@@ -132,11 +139,29 @@ int main(void)
 		
 		//If SysTick_Handler is called, wait as there is an interrupt
 
-		//Check to see if the conversion to digital value is operational or not
 		if(HAL_ADC_PollForConversion(&ADC1_Handle, 1000000) != HAL_OK) {
-			Error_Handler(ADC_INIT_FAIL);
+				Error_Handler(ADC_INIT_FAIL);
+		}
+		//Check to see if the conversion to digital value is operational or 
+		/*if (adc_started == 0)
+		{
+			if (HAL_ADC_Start(&ADC1_Handle) != HAL_OK) {
+				Error_Handler(ADC_INIT_FAIL);}
+			else adc_started = 1;
 		}
 		
+		if (adc_started == 1) 
+		{
+			
+			if(HAL_ADC_PollForConversion(&ADC1_Handle, 1000000) != HAL_OK) {
+				Error_Handler(ADC_INIT_FAIL);
+			}
+			else
+			{
+				adc_valid = 1;		
+			}
+		}
+		*/
 		//printf("The tick count is %d\n", loop_count_gbl);
 
 		//Resets counter to 0 when needed in keeping with the LED rotation tracking needs
@@ -144,18 +169,30 @@ int main(void)
 			loop_count_gbl = 0;
 		}
 		
-		//Measures temperature from sensor every 10ms -> 100Hz frequency
 		if (loop_count_gbl % 10 == 0) {
-			temperature = get_data_from_sensor();
+				temperature = get_data_from_sensor();
 		}
+		
+		//Measures temperature from sensor every 10ms -> 100Hz frequency
+		/*if (adc_valid == 1)
+		{
+			if (loop_count_gbl % 10 == 0) {
+				temperature = get_data_from_sensor();
+			}
+			adc_valid = 0;
+			HAL_ADC_Stop(&ADC1_Handle);
+			adc_started = 0;
+		}*/
 		
 		//Capture temperature to display every 500ms
 		if(loop_count_gbl % 250 == 0) {
-			printf("Temp: %f\t FilteredTemp: %f\n", temperature, filtered_temp);
+			
 			Kalmanfilter_C(temperature, &current_kstate);
 			filtered_temp = current_kstate.x;
+			
+			printf("Temp: %f\t FilteredTemp: %f\n", temperature, filtered_temp);
 			display_temp = filtered_temp;
-			LCD_display(25.2);
+			//LCD_display(25.2);
 		}
 		
 		
