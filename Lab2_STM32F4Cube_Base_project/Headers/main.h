@@ -52,7 +52,7 @@ typedef struct stateInfo{
 
 /* Exported ------------------------------------------------------------------*/
 extern ADC_HandleTypeDef ADC1_Handle;
-extern int ticks;
+extern int ticks; 
 //extern int display_ticks; 
 
 /* Private function prototypes -----------------------------------------------*/

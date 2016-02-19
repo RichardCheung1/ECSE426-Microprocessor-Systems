@@ -9,16 +9,7 @@
   ******************************************************************************
   */
 	
-#include "stm32f4xx_hal.h"
-#include "main.h"
-
-void update_segment_display(float f);
-void clear_segment_pin(void) ;
-void clear_select_pin(void); 
-void display_number(int number, int decimal);
-void set_position(int pos) ;
-void LCD_init(void);
-
+#include "segment_display.h"
 
 //READ & WRITE_
 //GPIO_PIN_0 
