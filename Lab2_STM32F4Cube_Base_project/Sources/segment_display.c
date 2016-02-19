@@ -6,6 +6,32 @@ void clear_segment_pin (void) ;
 void clear_select_pin(void); 
 void display_number(int number, int decimal);
 void set_position(int pos) ;
+void LCD_init(void) ; 
+
+
+//READ & WRITE_
+//GPIO_PIN_0 
+//
+//Register select
+//GPIO_PIN_1 
+//
+//GPIO_PIN_2  
+//Enable
+//
+//DATA_PINS:
+// GPIO_PIN_7 | GPIO_PIN_8  | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14
+// data 0							1								2						3							4							5								6					7
+void LCD_init(void) 
+{
+	//set  E & RS bit to LOW
+	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_2| GPIO_PIN_1, GPIO_PIN_RESET); 
+	
+	//display all + blick and underline
+	HAL_GPIO_WritePin (GPIOE, GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin (GPIOE, GPIO_PIN_7 | GPIO_PIN_8  |GPIO_PIN_9 |GPIO_PIN_10 , GPIO_PIN_SET);
+
+
+}
 
 
 //updates the segment display in the format of XY.Z by using the multiplexing
@@ -117,16 +143,3 @@ void clear_select_pin ()
 {
 		HAL_GPIO_WritePin (GPIOC , GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2| GPIO_PIN_3, GPIO_PIN_RESET); 			
 }
-//READ & WRITE_
-//GPIO_PIN_0 
-
-//Register select
-//GPIO_PIN_1 
-
-//GPIO_PIN_2  
-//Enable
-
-//DATA_PINS:
-//GPIO_PIN_7 | GPIO_PIN_8  | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14\
-
-

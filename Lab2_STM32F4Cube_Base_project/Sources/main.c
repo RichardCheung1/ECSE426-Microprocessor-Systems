@@ -143,7 +143,7 @@ int main(void)
 	GPIO_InitStruct.Pull = GPIO_NOPULL; 
 	HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 	
-	
+	LCD_init(); 
 	while (1){
 
 	while(!ticks);
