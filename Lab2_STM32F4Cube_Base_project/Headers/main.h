@@ -42,12 +42,13 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
 
-/* Exported types ------------------------------------------------------------*/
+/* Exported ------------------------------------------------------------------*/
 extern ADC_HandleTypeDef ADC1_Handle;
+
 extern int tick_count_gbl;
-/* Exported constants --------------------------------------------------------*/
-/* Exported macro ------------------------------------------------------------*/
-/* Exported functions ------------------------------------------------------- */
+extern int ticks; 
+extern int display_ticks; 
+
 extern float get_data_from_sensor(void);
 
 #endif /* __MAIN_H */

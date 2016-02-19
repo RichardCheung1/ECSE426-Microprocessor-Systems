@@ -38,6 +38,8 @@ GPIO_TypeDef GPIO_struct;
 ADC_HandleTypeDef ADC1_Handle;
 
 int tick_count_gbl;
+int ticks = 0; 
+int display_ticks; 
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config	(void);
@@ -61,7 +63,6 @@ int main(void)
 	
 	//Temp delay var
 	int i = 0;
-	
 	int p,u ;
 
 	//Global 
@@ -133,38 +134,20 @@ int main(void)
 	GPIO_InitStruct.Pull = GPIO_NOPULL; 
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 	
-	HAL_GPIO_WritePin (GPIOD, GPIO_PIN_12 | GPIO_PIN_13 |GPIO_PIN_14 | GPIO_PIN_15, GPIO_PIN_SET);
-
-	/*HAL_GPIO_WritePin (GPIOC, GPIO_PIN_0, GPIO_PIN_SET);
-	HAL_GPIO_WritePin (GPIOC, GPIO_PIN_1, GPIO_PIN_SET);	
-	HAL_GPIO_WritePin (GPIOC, GPIO_PIN_2, GPIO_PIN_SET);	
-	HAL_GPIO_WritePin (GPIOC, GPIO_PIN_3, GPIO_PIN_SET);*/
-	
-	/*HAL_GPIO_WritePin (GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
-	HAL_GPIO_WritePin (GPIOA, GPIO_PIN_1, GPIO_PIN_SET);	
-	HAL_GPIO_WritePin (GPIOA, GPIO_PIN_2, GPIO_PIN_SET);	
-	HAL_GPIO_WritePin (GPIOA, GPIO_PIN_3, GPIO_PIN_SET);	
-	HAL_GPIO_WritePin (GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
-	HAL_GPIO_WritePin (GPIOA, GPIO_PIN_5, GPIO_PIN_SET);	
-	HAL_GPIO_WritePin (GPIOA, GPIO_PIN_6, GPIO_PIN_SET);	
-	HAL_GPIO_WritePin (GPIOA, GPIO_PIN_7, GPIO_PIN_SET);	*/
-	
-
-
-	HAL_GPIO_WritePin (GPIOD, GPIO_PIN_12 | GPIO_PIN_13 |GPIO_PIN_14 | GPIO_PIN_15, GPIO_PIN_RESET);
-
-	//temperature = get_data_from_sensor();
 	while (1){
-		
+	while(!ticks);
 		//printf("The tick count is %d\n", tick_count_gbl);		
 		if(tick_count_gbl >= (ALARM_PERIOD*4))
 		{
 			tick_count_gbl = 0;
 		}
-		if ( tick_count_gbl % 25 == 0) 
-		{
-			update_segment_display(get_data_from_sensor()); 
+		if( display_ticks % 10 == 0 ) {
+			temperature = get_data_from_sensor();
+			display_ticks = 0;
 		}
+		
+		update_segment_display(temperature);
+
 		
 		if(filteredTemp > OVERHEAT_TEMP) {
 			launch_overheat_alarm(tick_count_gbl);

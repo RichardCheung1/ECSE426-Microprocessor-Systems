@@ -157,11 +157,15 @@ void PendSV_Handler(void)
   */
 void SysTick_Handler(void)
 {
-		HAL_IncTick();
+	HAL_IncTick();
+	ticks = 1;
+	tick_count_gbl++;
+	if ( tick_count_gbl % 10 == 0 ){ 
 		if (HAL_ADC_PollForConversion(&ADC1_Handle, 1000000) == HAL_OK) {
 			get_data_from_sensor();
 		}
-		tick_count_gbl++;
+		display_ticks ++; 
+	}
 }
 
 /******************************************************************************/
