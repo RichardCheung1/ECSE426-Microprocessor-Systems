@@ -161,7 +161,7 @@ int main(void)
 			filtered_temp = current_kstate.x;
 		}
 		
-		//LCD_display(25.2);
+		LCD_display(25.2);
 		
 		
 		//Display the value caught at every 500ms interval to stabilize the 7seg display

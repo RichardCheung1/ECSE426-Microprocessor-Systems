@@ -29,6 +29,16 @@ void LCD_init(void)
 	//reset all pins
 	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_0| GPIO_PIN_1| GPIO_PIN_2 | GPIO_PIN_7 | GPIO_PIN_8  | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14, GPIO_PIN_RESET); 
 	
+	Set_RS;
+	Set_RW;
+	Set_En;
+	
+	for ( i =0; i < 65535 ; i++ ){}
+
+	Clr_RS;
+	Clr_RW;
+	Clr_En;
+	
 	//Clear display
 	LCD_clear_display();
 	
@@ -54,17 +64,17 @@ void LCD_init(void)
 	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_10 | GPIO_PIN_9, GPIO_PIN_RESET) ;
 	LCD_set_enable();
 		
-
 }
-
+//function set enable to HIGH --> DELAY --> LOW
 void LCD_set_enable (void)
 {
 	int i; 
 	Set_En;
-	// delay
 	for ( i =0; i < 300 ; i++ ){}
 	Clr_En;
+	for ( i =0; i < 300 ; i++ ){}
 }
+
 //function that clear the LCD display
 void LCD_clear_display (void) 
 {
@@ -77,18 +87,51 @@ void LCD_display( float f)
 	int i;
 	int number = f*10 ;
 	int position = 0;
-
-	LCD_clear_display();
+	
 	LCD_send_char(number %10) ;
+	Set_RS;
+
+	LCD_set_enable();
 
 }
 
 void LCD_send_char (int number) 
 {
-	char c = (char) number; 
-	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_1, GPIO_PIN_SET);
-	LCD_set_enable();
-	
+	//reset all data pin
+	HAL_GPIO_WritePin (GPIOE , GPIO_PIN_7 | GPIO_PIN_8  | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 , GPIO_PIN_RESET);
+	switch (number) 
+	{
+		case 0:
+			HAL_GPIO_WritePin (GPIOE , GPIO_PIN_9| GPIO_PIN_10 , GPIO_PIN_SET);
+			break;
+		case 1:
+			HAL_GPIO_WritePin (GPIOE , GPIO_PIN_9| GPIO_PIN_10 | GPIO_PIN_14 , GPIO_PIN_SET); 
+			break;
+		case 2:
+			HAL_GPIO_WritePin (GPIOE , GPIO_PIN_9| GPIO_PIN_10 | GPIO_PIN_13 , GPIO_PIN_SET); 
+			break;
+		case 3:
+			HAL_GPIO_WritePin (GPIOE , GPIO_PIN_9| GPIO_PIN_10 | GPIO_PIN_14 | GPIO_PIN_13, GPIO_PIN_SET); 			
+			break;
+		case 4:
+			HAL_GPIO_WritePin (GPIOE , GPIO_PIN_9| GPIO_PIN_10 | GPIO_PIN_12, GPIO_PIN_SET); 			
+			break;
+		case 5:
+			HAL_GPIO_WritePin (GPIOE , GPIO_PIN_9| GPIO_PIN_10 |GPIO_PIN_12 | GPIO_PIN_14, GPIO_PIN_SET); 			
+			break;
+		case 6:
+			HAL_GPIO_WritePin (GPIOE , GPIO_PIN_9| GPIO_PIN_10  | GPIO_PIN_12 | GPIO_PIN_13  , GPIO_PIN_SET); 			
+			break;
+		case 7:
+			HAL_GPIO_WritePin (GPIOE , GPIO_PIN_9| GPIO_PIN_10 | GPIO_PIN_12| GPIO_PIN_13 | GPIO_PIN_14, GPIO_PIN_SET); 			
+			break;
+		case 8:
+			HAL_GPIO_WritePin (GPIOE , GPIO_PIN_9| GPIO_PIN_10 | GPIO_PIN_11 , GPIO_PIN_SET); 			
+			break;
+		case 9:
+			HAL_GPIO_WritePin (GPIOE , GPIO_PIN_9| GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_14, GPIO_PIN_SET); 			
+			break;	
+	}	
 }
 
 //updates the segment display in the format of XY.Z by using the multiplexing
