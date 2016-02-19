@@ -23,6 +23,11 @@
 //DATA_PINS:
 // GPIO_PIN_7 | GPIO_PIN_8  | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14
 // data 0							1								2						3							4							5								6					7
+
+/**
+   * @brief A function used to initialize the LCD
+	 * @retval 
+   */
 void LCD_init(void) 
 {
 	int i ;
@@ -65,7 +70,11 @@ void LCD_init(void)
 	LCD_set_enable();
 		
 }
-//function set enable to HIGH --> DELAY --> LOW
+
+/**
+   * @brief A function used to set LCD enable to HIGH->DELAY->LOW
+	 * @retval 
+   */
 void LCD_set_enable (void)
 {
 	int i; 
@@ -75,13 +84,20 @@ void LCD_set_enable (void)
 	for ( i =0; i < 300 ; i++ ){}
 }
 
-//function that clear the LCD display
+/**
+   * @brief A function used to clear the LCD display
+	 * @retval 
+   */
 void LCD_clear_display (void) 
 {
 	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_7, GPIO_PIN_RESET);
 	LCD_set_enable();
 }
 
+/**
+   * @brief A function used to displays to the LCD
+	 * @retval
+   */
 void LCD_display( float f) 
 {
 	int i;
@@ -134,6 +150,10 @@ void LCD_send_char (int number)
 	}	
 }
 
+/**
+   * @brief A function used to update the seven segment display with the temp value
+	 * @param float f: float containing the temperature value in celcius
+   */
 //updates the segment display in the format of XY.Z by using the multiplexing
 void update_segment_display(float f)
 {	
@@ -178,6 +198,7 @@ void update_segment_display(float f)
 		}
 	}
 }
+
 // function that takes parameters number and decimal which turns on the appropriate pins to generate the right
 // number for the standard 7 segment display. The decimal parameter is a flag to determine if that digit have decimal. 
 //
@@ -188,8 +209,14 @@ void update_segment_display(float f)
 //SEGMENT E - GPIO_PIN_4
 //SEGMENT F - GPIO_PIN_5
 //SEGMENT G - GPIO_PIN_6
-//SEGMENT DT - GPIO_PIN_7
-//
+//SEGMENT DP - GPIO_PIN_7
+
+/**
+   * @brief A function used to display a specific number using the segment pins
+	 * @retval none
+	 * @param decimal defines whether there is a decimal point or not
+	 * @param number is the value of the digit
+   */
 void display_number(int number, int decimal)
 {	
 	clear_segment_pin();
@@ -232,12 +259,19 @@ void display_number(int number, int decimal)
 	}
 }
 
-//set all segments to GPIO_PIN_RESET
+/**
+   * @brief A function used to set all segments to GPIO_PIN_RESET
+	 * @retval none
+   */
 void clear_segment_pin () 
 {
 	HAL_GPIO_WritePin (GPIOA , GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2| GPIO_PIN_3 |GPIO_PIN_4 |GPIO_PIN_5 |GPIO_PIN_6 |GPIO_PIN_7 , GPIO_PIN_RESET); 			
 }
 
+/**
+   * @brief A function used to reset the select lines
+	 * @retval none
+   */
 //set all select digit to GPIO_PIN_RESET
 void clear_select_pin () 
 {
