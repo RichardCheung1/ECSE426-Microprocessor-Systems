@@ -296,7 +296,7 @@ float get_data_from_sensor (void) {
 	//printf("The voltage from sensor is %f\n", voltage);
 	
 	//Apply the proper scaling to convert to voltage from base 12 ADC equivalent
-	voltage = (3.3f * voltage) / 4096.0f;
+	voltage = (3.0f * voltage) / 4096.0f;
 	
 	//Convert the voltage to celcius
 	temperature = convert_voltage_to_celcius(voltage);
