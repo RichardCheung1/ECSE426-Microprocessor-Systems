@@ -41,15 +41,29 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
+#include "segment_display.h"
+#include "supporting_functions.h"
+#include "temperature_sensor.h"
+
+/* Structs -------------------------------------------------------------------*/
+typedef struct stateInfo{
+	float q, r, x, p, k;
+}kalman_state;
 
 /* Exported ------------------------------------------------------------------*/
 extern ADC_HandleTypeDef ADC1_Handle;
-
-extern int tick_count_gbl;
 extern int ticks; 
-extern int display_ticks; 
+//extern int display_ticks; 
 
-extern float get_data_from_sensor(void);
+
+
+/* Private function prototypes -----------------------------------------------*/
+void SystemClock_Config	(void);
+void set_adc_channel (void);
+float filter_sensor_data (float voltage);
+void launch_overheat_alarm (int tick_cnt);
+int Kalmanfilter_C(float measured_voltage, kalman_state* kstate);
+
 
 #endif /* __MAIN_H */
 
