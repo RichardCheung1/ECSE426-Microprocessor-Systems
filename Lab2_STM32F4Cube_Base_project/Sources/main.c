@@ -152,15 +152,11 @@ int main(void)
 		
 		//Capture temperature to display every 500ms
 		if(loop_count_gbl % 250 == 0) {
-			display_temp = temperature;
 			printf("Temp: %f\t FilteredTemp: %f\n", temperature, filtered_temp);
 			Kalmanfilter_C(temperature, &current_kstate);
 			filtered_temp = current_kstate.x;
-		}
-		
-		//Capture temperature to display every 500ms
-		if(loop_count_gbl % 500 == 0) {
-			display_temp = filtered_temp; 
+			display_temp = filtered_temp;
+
 		}
 		
 		//LCD_display(25.2);
