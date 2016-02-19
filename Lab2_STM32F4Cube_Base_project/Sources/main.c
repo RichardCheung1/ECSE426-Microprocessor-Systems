@@ -5,16 +5,14 @@
 	                       The ADC
 	* Author						 : Richard Cheung, Taha Saifuddin
 	* Version            : 1.0.0
-	* Date							 : February 17th, 2016
+	* Date							 : February 19th, 2016
   ******************************************************************************
   */
 	
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx_hal.h"
-#include "supporting_functions.h"
-#include "main.h"
 #include "init.c"
-#include "segment_display.h"
+#include "main.h"
+
 
 /* Constants -----------------------------------------------------------------*/
 #define ALARM_PERIOD	500
@@ -22,52 +20,30 @@
 #define OVERHEAT_TEMP	(float)50
 #define ALARM_RESET -1	
 
-
-/* Structs -------------------------------------------------------------------*/
-typedef struct stateInfo{
-	float q, r, x, p, k;
-}kalman_state;
-
 /* Private variables ---------------------------------------------------------*/
 ADC_InitTypeDef ADC_InitStruct;
 ADC_ChannelConfTypeDef ADC_ChannelStruct;
 GPIO_InitTypeDef GPIO_InitStruct;
-GPIO_TypeDef GPIO_struct;
 
-/* Global variables ----_-----------------------------------------------------*/
+/* Global variables ----------------------------------------------------------*/
 ADC_HandleTypeDef ADC1_Handle;
+int loop_count_gbl;
+int ticks = 0;
 
-int tick_count_gbl;
-int ticks = 0; 
+//int display_ticks; 
 
-/* Private function prototypes -----------------------------------------------*/
-void SystemClock_Config	(void);
-void set_adc_channel (void);
-
-float get_data_from_sensor(void);
-float filter_sensor_data (float voltage);
-float convert_voltage_to_celcius (float voltage);
-void launch_overheat_alarm (int tick_cnt);
-void reset_overheat_alarm (void);
-
-
-int Kalmanfilter_C(float measured_voltage, kalman_state* kstate);
-
-/* Private function prototypes -----------------------------------------------*/
+/* Private function implementations ------------------------------------------*/
 int main(void)
 {
-	//Temp vars
-	float temperature, display_temp;
-	float filteredTemp = 55.0f;
-
-	//Temp delay var
-	int i = 0;
+	//Variables to store temperature
+	float temperature = 0.0f;
+	float display_temp = 0.0f;
+	float filtered_temp = 55.0f;
 
 	//Variable to keep track of alarm status
 	int is_alarm_on = 0;
-
-	//Global 
-	tick_count_gbl = 0;
+ 
+	loop_count_gbl = 0;
 	
   /* MCU Configuration----------------------------------------------------------*/
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
@@ -76,27 +52,28 @@ int main(void)
   /* Configure the system clock */
   SystemClock_Config();
 	
-	//Enable GPIO CLK
+	//Enable the GPIO clocks
 	__HAL_RCC_GPIOD_CLK_ENABLE();
 	__HAL_RCC_GPIOC_CLK_ENABLE();
 	__HAL_RCC_GPIOA_CLK_ENABLE();
-	__HAL_RCC_GPIOE_CLK_ENABLE(); 
-
+	__HAL_RCC_GPIOE_CLK_ENABLE();
+	
+	//Enable the ADC clock
 	__HAL_RCC_ADC1_CLK_ENABLE();
 	
-	/* Configure the GPIO struct for LED */
+	//Configure the GPIO struct for the 4 LEDs on the discovery board
 	GPIO_InitStruct.Pin = GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15; 
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP; 
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FAST; 
 
-	//initialize GPIOD for LED
+	//Initialize GPIO for the LEDs
 	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 	
 	//Set ADC handler to ADC1
 	ADC1_Handle.Instance = ADC1 ;
 
-	//set ADC_InitTypeDef parameters
+	//Configure ADC_InitTypeDef parameters
 	ADC_InitStruct.DataAlign = ADC_DATAALIGN_RIGHT;
 	ADC_InitStruct.ClockPrescaler = ADC_CLOCKPRESCALER_PCLK_DIV4; 
 	ADC_InitStruct.Resolution = ADC_RESOLUTION_12B; 
@@ -114,65 +91,71 @@ int main(void)
 		Error_Handler(ADC_INIT_FAIL);
 	}
 	
-	//set the channel for the ADC 
+	//Configure the channel for the ADC 
 	set_adc_channel(); 
 	
-	/* Setting up polling */
+	//Start polling mode
 	if (HAL_ADC_Start(&ADC1_Handle) != HAL_OK) {
 		Error_Handler(ADC_INIT_FAIL);
 	}
 	
-	//	Configure GPIOC for the 4 select lines
+	//Configure GPIOC for the 4 select lines
 	GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
 	GPIO_InitStruct.Pull = GPIO_NOPULL; 
 	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 	
-	//	Configure GPIOA for the segments
+	//Configure GPIOA for the segments
 	GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
 	GPIO_InitStruct.Pull = GPIO_NOPULL; 
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 	
-	// Configure GPIOE for the LCD display
+	//Configure GPIOE for the LCD display
 	GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2  | GPIO_PIN_7 | GPIO_PIN_8  | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Pull = GPIO_NOPULL; 
 	HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 	
-	LCD_init(); 
+	//Initialize the LCD display
+	LCD_init();
+	
 	while (1){
+		
+		//If SysTick_Handler is called, wait as there is an interrupt
+		while(!ticks);
 
-	while(!ticks);
 		//Check to see if the conversion to digital value is operational or not
 		if(HAL_ADC_PollForConversion(&ADC1_Handle, 1000000) != HAL_OK) {
 			Error_Handler(ADC_INIT_FAIL);
 		}
 		
-		//printf("The tick count is %d\n", tick_count_gbl);
+		//printf("The tick count is %d\n", loop_count_gbl);
 
 		//Resets counter to 0 when needed in keeping with the LED rotation tracking needs
-		if(tick_count_gbl >= (ALARM_PERIOD*4)) {
-			tick_count_gbl = 0;
+		if(loop_count_gbl >= (ALARM_PERIOD*4)) {
+			loop_count_gbl = 0;
 		}
 		
 		//Measures temperature from sensor every 10ms -> 100Hz frequency
-		if (tick_count_gbl % 10 == 0) {
+		if (loop_count_gbl % 10 == 0) {
 			temperature = get_data_from_sensor();
 		}
 		
-		//Outputs temperature to display every 500ms to stabilize the 7seg display
-		if(tick_count_gbl % 500 == 0) {
-				display_temp = temperature; 
+		//Capture temperature to display every 500ms
+		if(loop_count_gbl % 500 == 0) {
+			display_temp = temperature; 
 		}
-		update_segment_display(display_temp); 
-
+		
+		//Display the value caught at every 500ms interval to stabilize the 7seg display
+		update_segment_display(display_temp);
+		
 		//Launches overheating alarm if the temperature is greater than the upper threshold
-		if(filteredTemp > OVERHEAT_TEMP) {
-			launch_overheat_alarm(tick_count_gbl);
+		if(filtered_temp > OVERHEAT_TEMP) {
+			launch_overheat_alarm(loop_count_gbl);
 			
 			//Toggles the alarm status
 			if(!is_alarm_on) {
@@ -257,60 +240,34 @@ void set_adc_channel (void) {
 void launch_overheat_alarm (int tick_cnt) {
 
 	if(tick_cnt == ALARM_RESET) {
-		HAL_GPIO_WritePin(&GPIO_struct, GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15, GPIO_PIN_RESET);
 	} else {
 		if(tick_cnt >= 0 && tick_cnt < ALARM_PERIOD) {
-			//printf("LED 1\n");
+			
 			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_RESET);
 			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
-		} //for(i = 0; i < ALARM_PERIOD; i++);
+		}
 		
 		if(tick_cnt >= ALARM_PERIOD && tick_cnt < (ALARM_PERIOD*2)) {
-			//printf("LED 2\n");
+			
 			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
 			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
-		} //(i = 0; i < ALARM_PERIOD; i++);
+		}
 		
 		if(tick_cnt >= (ALARM_PERIOD*2) && tick_cnt < (ALARM_PERIOD*3)) {
-			//printf("LED 3\n");
+			
 			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
 			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
-		}//for(i = 0; i < ALARM_PERIOD; i++);
+		}
 		
 		if(tick_cnt >= (ALARM_PERIOD*3) && tick_cnt < (ALARM_PERIOD*4)) {
-			//printf("LED 4\n");
+			
 			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
 			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_SET);
-		} //for(i = 0; i < ALARM_PERIOD; i++);
+		}
 	}
 }
 
-/**
-   * @brief A function used to get the sensor data from ADC
-	 * @retval temperature: float containing the temperature value
-   */
-float get_data_from_sensor (void) {
-	
-	float voltage;
-	float temperature;
-	
-	//Get the raw data from the internal temperature sensor
-	voltage = HAL_ADC_GetValue(&ADC1_Handle) * 1.0f;
-	
-	//printf("The voltage from sensor is %f\n", voltage);
-	
-	//Apply the proper scaling to convert to voltage from base 12 ADC equivalent
-	voltage = (3.0f * voltage) / 4096.0f;
-	
-	//Convert the voltage to celcius
-	temperature = convert_voltage_to_celcius(voltage);
-	
-	//Filter the sensor data
-	//temperature = filter_sensor_data(temperature);
-	
-	printf("%f;", temperature);
-	return temperature;
-}
 
 /**
    * @brief A function used to filter the sensor data from ADC
@@ -320,23 +277,6 @@ float filter_sensor_data (float voltage) {
 	float filtered_voltage;
 	
 	return filtered_voltage;
-}
-
-/**
-   * @brief A function used to convert the sensor data to temperature in celcius
-	 * @retval temperature_celcius: float containing the temperature value in celcius
-   */
-float convert_voltage_to_celcius (float voltage) {
-	float temperature_celcius;
-	
-	/** Temperature(°C) = ((V_SENSE - V_25) / Avg_Slope) + 25
-		* where V_SENSE is voltage read from the internal temp sensor
-		*				V_25 is the reference voltage at 25°C -> 0.76V
-		*				Avg_Slope is the average slope of temperature vs V_SENSE curve -> 2.5mV/°C
-	**/
-	temperature_celcius = (((voltage - 0.76f) / 0.0025f) + 25.0f);
-	
-	return temperature_celcius;
 }
 
 //The following method takes an array of measurements and filters the values using the Kalman Filter
