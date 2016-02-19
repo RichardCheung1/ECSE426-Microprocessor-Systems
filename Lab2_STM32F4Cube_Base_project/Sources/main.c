@@ -131,7 +131,6 @@ int main(void)
 	while (1){
 		
 		//If SysTick_Handler is called, wait as there is an interrupt
-		while(!ticks);
 
 		//Check to see if the conversion to digital value is operational or not
 		if(HAL_ADC_PollForConversion(&ADC1_Handle, 1000000) != HAL_OK) {
@@ -156,10 +155,9 @@ int main(void)
 			Kalmanfilter_C(temperature, &current_kstate);
 			filtered_temp = current_kstate.x;
 			display_temp = filtered_temp;
-
+			LCD_display(25.2);
 		}
 		
-		//LCD_display(25.2);
 		
 		//Display the value caught at every 500ms interval to stabilize the 7seg display
 		update_segment_display(display_temp);
@@ -182,7 +180,6 @@ int main(void)
 				launch_overheat_alarm(ALARM_RESET);
 				is_alarm_on = 0;
 			}
-			
 		}
 	}
 }

@@ -117,10 +117,10 @@ void LCD_send_char (int number)
 			HAL_GPIO_WritePin (GPIOE , GPIO_PIN_9| GPIO_PIN_10 | GPIO_PIN_12, GPIO_PIN_SET); 			
 			break;
 		case 5:
-			HAL_GPIO_WritePin (GPIOE , GPIO_PIN_9| GPIO_PIN_10 |GPIO_PIN_12 | GPIO_PIN_14, GPIO_PIN_SET); 			
+			HAL_GPIO_WritePin (GPIOE , GPIO_PIN_9| GPIO_PIN_10 | GPIO_PIN_12 | GPIO_PIN_14, GPIO_PIN_SET); 			
 			break;
 		case 6:
-			HAL_GPIO_WritePin (GPIOE , GPIO_PIN_9| GPIO_PIN_10  | GPIO_PIN_12 | GPIO_PIN_13  , GPIO_PIN_SET); 			
+			HAL_GPIO_WritePin (GPIOE , GPIO_PIN_9| GPIO_PIN_10 | GPIO_PIN_12 | GPIO_PIN_13  , GPIO_PIN_SET); 			
 			break;
 		case 7:
 			HAL_GPIO_WritePin (GPIOE , GPIO_PIN_9| GPIO_PIN_10 | GPIO_PIN_12| GPIO_PIN_13 | GPIO_PIN_14, GPIO_PIN_SET); 			
