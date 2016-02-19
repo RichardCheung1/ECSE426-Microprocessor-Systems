@@ -158,12 +158,12 @@ int main(void)
 		
 		//printf("The tick count is %d\n", tick_count_gbl);		
 		if(tick_count_gbl >= (ALARM_PERIOD*4))
+		{
 			tick_count_gbl = 0;
-		if ( tick_count_gbl % 5) {
-			for ( p = 0 ; p < 9 ; p++ ) 
-			{
-				update_segment_display(filteredTemp+(0.1*p)); 
-			}
+		}
+		if ( tick_count_gbl % 25 == 0) 
+		{
+			update_segment_display(get_data_from_sensor()); 
 		}
 		
 		if(filteredTemp > OVERHEAT_TEMP) {
