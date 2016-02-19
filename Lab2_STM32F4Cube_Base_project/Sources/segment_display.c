@@ -1,12 +1,23 @@
+/**
+  ******************************************************************************
+  * File Name          : segment_display.c
+  * Description        : This class provides functionality for controlling the
+												 7 segment display
+	* Author						 : Richard Cheung, Taha Saifuddin
+	* Version            : 1.0.0
+	* Date							 : February 19th, 2016
+  ******************************************************************************
+  */
+	
 #include "stm32f4xx_hal.h"
 #include "main.h"
 
 void update_segment_display(float f);
-void clear_segment_pin (void) ;
+void clear_segment_pin(void) ;
 void clear_select_pin(void); 
 void display_number(int number, int decimal);
 void set_position(int pos) ;
-void LCD_init(void) ; 
+void LCD_init(void);
 
 
 //READ & WRITE_
@@ -141,5 +152,5 @@ void clear_segment_pin ()
 //set all select digit to GPIO_PIN_RESET
 void clear_select_pin () 
 {
-		HAL_GPIO_WritePin (GPIOC , GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2| GPIO_PIN_3, GPIO_PIN_RESET); 			
+	HAL_GPIO_WritePin (GPIOC , GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2| GPIO_PIN_3, GPIO_PIN_RESET); 			
 }
