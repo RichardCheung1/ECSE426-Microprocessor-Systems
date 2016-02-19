@@ -146,8 +146,13 @@ int main(void)
 		}
 		
 		//Measures temperature from sensor every 10ms -> 100Hz frequency
-		if (loop_count_gbl % 200 == 0) {
+		if (loop_count_gbl % 10 == 0) {
 			temperature = get_data_from_sensor();
+		}
+		
+		//Capture temperature to display every 500ms
+		if(loop_count_gbl % 250 == 0) {
+			display_temp = temperature;
 			printf("Temp: %f\t FilteredTemp: %f\n", temperature, filtered_temp);
 			Kalmanfilter_C(temperature, &current_kstate);
 			filtered_temp = current_kstate.x;
@@ -158,9 +163,12 @@ int main(void)
 			display_temp = filtered_temp; 
 		}
 		
+		//LCD_display(25.2);
+		
 		//Display the value caught at every 500ms interval to stabilize the 7seg display
 		update_segment_display(display_temp);
-		
+
+
 		//Launches overheating alarm if the temperature is greater than the upper threshold
 		if(filtered_temp > OVERHEAT_TEMP) {
 			launch_overheat_alarm(loop_count_gbl);

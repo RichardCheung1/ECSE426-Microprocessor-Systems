@@ -4,15 +4,28 @@
 #include "stm32f4xx_hal.h"
 #include "main.h"
 
+#define Set_RS HAL_GPIO_WritePin( GPIOE, GPIO_PIN_1, GPIO_PIN_SET);
+#define Clr_RS HAL_GPIO_WritePin( GPIOE, GPIO_PIN_1, GPIO_PIN_RESET);
+
+#define Set_RW HAL_GPIO_WritePin( GPIOE, GPIO_PIN_0, GPIO_PIN_SET);
+#define Clr_RW HAL_GPIO_WritePin( GPIOE, GPIO_PIN_0, GPIO_PIN_RESET);
+
+#define Set_En 	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_2, GPIO_PIN_SET);
+#define Clr_En	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_2, GPIO_PIN_RESET);
+
+
 /* Exported functions ------------------------------------------------------- */
 extern void update_segment_display(float f);
 extern void clear_segment_pin(void);
 extern void clear_select_pin(void); 
 extern void LCD_init(void); 
-extern void LCD_clear_display (void) ;
+extern void LCD_display(float f) ;
 
 /* Private functions -------------------------------------------------------- */
 void display_number(int number, int decimal);
 void set_position(int pos);
+void LCD_clear_display (void) ;
+void LCD_send_char (int number) ;
+void LCD_set_enable(void); 
 
 #endif /* __SEGMENT_DISPLAY_H */
