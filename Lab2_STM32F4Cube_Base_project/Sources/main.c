@@ -59,8 +59,8 @@ int main(void)
 	float temperature;
 	float filteredTemp = 55.0f;
 	
-	//Temp delay var
-	int i = 0;
+	//Variable to keep track of alarm status
+	int is_alarm_on = 0;
 	
 	int p,u ;
 
@@ -156,20 +156,46 @@ int main(void)
 	//temperature = get_data_from_sensor();
 	while (1){
 		
-		//printf("The tick count is %d\n", tick_count_gbl);		
-		if(tick_count_gbl >= (ALARM_PERIOD*4))
-		{
-			tick_count_gbl = 0;
-		}
-		if ( tick_count_gbl % 25 == 0) 
-		{
-			update_segment_display(get_data_from_sensor()); 
+		//Check to see if the conversion to digital value is operational or not
+		if(HAL_ADC_PollForConversion(&ADC1_Handle, 1000000) != HAL_OK) {
+			Error_Handler(ADC_INIT_FAIL);
 		}
 		
+		//printf("The tick count is %d\n", tick_count_gbl);
+
+		//Resets counter to 0 when needed in keeping with the LED rotation tracking needs
+		if(tick_count_gbl >= (ALARM_PERIOD*4)) {
+			tick_count_gbl = 0;
+		}
+		
+		//Measures temperature from sensor every 10ms -> 100Hz frequency
+		if (tick_count_gbl % 10 == 0) {
+			temperature = get_data_from_sensor();
+		}
+		
+		//Outputs temperature to display every 500ms to stabilize the 7seg display
+		if(tick_count_gbl % 500 == 0) {
+			update_segment_display(temperature); 
+		}
+		
+		//Launches overheating alarm if the temperature is greater than the upper threshold
 		if(filteredTemp > OVERHEAT_TEMP) {
 			launch_overheat_alarm(tick_count_gbl);
+			
+			//Toggles the alarm status
+			if(!is_alarm_on) {
+				is_alarm_on = 1;
+			}
+			
+		//Turn off alarm if temp is back to normal
 		} else {
-			launch_overheat_alarm(ALARM_RESET);
+			
+			//Turns off the alarm and toggles the alarm status boolean;
+			if(is_alarm_on) {
+				launch_overheat_alarm(ALARM_RESET);
+				is_alarm_on = 0;
+			}
+			
 		}
 	}
 }
@@ -277,15 +303,18 @@ float get_data_from_sensor (void) {
 	float temperature;
 	
 	//Get the raw data from the internal temperature sensor
-	voltage = HAL_ADC_GetValue(&ADC1_Handle);
-	//printf("The voltage from sensor is %f\n", voltage);
-	voltage = (3*voltage) / 4096;
+	voltage = HAL_ADC_GetValue(&ADC1_Handle) * 1.0f;
 	
-	//Filter the sensor data
-	//voltage = filter_sensor_data(voltage);
+	//printf("The voltage from sensor is %f\n", voltage);
+	
+	//Apply the proper scaling to convert to voltage from base 12 ADC equivalent
+	voltage = (3.3f * voltage) / 4096.0f;
 	
 	//Convert the voltage to celcius
 	temperature = convert_voltage_to_celcius(voltage);
+	
+	//Filter the sensor data
+	//temperature = filter_sensor_data(temperature);
 	
 	printf("%f;", temperature);
 	return temperature;
