@@ -117,3 +117,16 @@ void clear_select_pin ()
 {
 		HAL_GPIO_WritePin (GPIOC , GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2| GPIO_PIN_3, GPIO_PIN_RESET); 			
 }
+//READ & WRITE_
+//GPIO_PIN_0 
+
+//Register select
+//GPIO_PIN_1 
+
+//GPIO_PIN_2  
+//Enable
+
+//DATA_PINS:
+//GPIO_PIN_7 | GPIO_PIN_8  | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14\
+
+

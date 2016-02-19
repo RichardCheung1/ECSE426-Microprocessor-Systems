@@ -39,7 +39,6 @@ ADC_HandleTypeDef ADC1_Handle;
 
 int tick_count_gbl;
 int ticks = 0; 
-int display_ticks; 
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config	(void);
@@ -58,16 +57,14 @@ int Kalmanfilter_C(float measured_voltage, kalman_state* kstate);
 int main(void)
 {
 	//Temp vars
-	float temperature;
+	float temperature, display_temp;
 	float filteredTemp = 55.0f;
-	
+
 	//Temp delay var
 	int i = 0;
 
 	//Variable to keep track of alarm status
 	int is_alarm_on = 0;
-	
-	int p,u ;
 
 	//Global 
 	tick_count_gbl = 0;
@@ -83,6 +80,7 @@ int main(void)
 	__HAL_RCC_GPIOD_CLK_ENABLE();
 	__HAL_RCC_GPIOC_CLK_ENABLE();
 	__HAL_RCC_GPIOA_CLK_ENABLE();
+	__HAL_RCC_GPIOE_CLK_ENABLE(); 
 
 	__HAL_RCC_ADC1_CLK_ENABLE();
 	
@@ -92,10 +90,10 @@ int main(void)
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FAST; 
 
-	
-	//initialize GPIO
+	//initialize GPIOD for LED
 	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 	
+	//Set ADC handler to ADC1
 	ADC1_Handle.Instance = ADC1 ;
 
 	//set ADC_InitTypeDef parameters
@@ -138,12 +136,17 @@ int main(void)
 	GPIO_InitStruct.Pull = GPIO_NOPULL; 
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 	
+	// Configure GPIOE for the LCD display
+	GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2  | GPIO_PIN_7 | GPIO_PIN_8  | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL; 
+	HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+	
+	
 	while (1){
 
 	while(!ticks);
-		
-		update_segment_display(temperature);
-
 		//Check to see if the conversion to digital value is operational or not
 		if(HAL_ADC_PollForConversion(&ADC1_Handle, 1000000) != HAL_OK) {
 			Error_Handler(ADC_INIT_FAIL);
@@ -163,9 +166,10 @@ int main(void)
 		
 		//Outputs temperature to display every 500ms to stabilize the 7seg display
 		if(tick_count_gbl % 500 == 0) {
-			update_segment_display(temperature); 
+				display_temp = temperature; 
 		}
-		
+		update_segment_display(display_temp); 
+
 		//Launches overheating alarm if the temperature is greater than the upper threshold
 		if(filteredTemp > OVERHEAT_TEMP) {
 			launch_overheat_alarm(tick_count_gbl);

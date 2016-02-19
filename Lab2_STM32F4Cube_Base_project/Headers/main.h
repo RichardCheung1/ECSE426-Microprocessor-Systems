@@ -47,7 +47,6 @@ extern ADC_HandleTypeDef ADC1_Handle;
 
 extern int tick_count_gbl;
 extern int ticks; 
-extern int display_ticks; 
 
 extern float get_data_from_sensor(void);
 
