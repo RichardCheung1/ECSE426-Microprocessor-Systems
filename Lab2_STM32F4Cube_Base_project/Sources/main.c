@@ -129,8 +129,7 @@ int main(void)
 	
 	printf("This is where the temp sensing starts\n");
 	while (1){
-		HAL_GPIO_WritePin (GPIOE, GPIO_PIN_7 | GPIO_PIN_8  |GPIO_PIN_9 |GPIO_PIN_10 , GPIO_PIN_SET);
-
+		
 		//If SysTick_Handler is called, wait as there is an interrupt
 		while(!ticks);
 
@@ -149,24 +148,21 @@ int main(void)
 		//Measures temperature from sensor every 10ms -> 100Hz frequency
 		if (loop_count_gbl % 200 == 0) {
 			temperature = get_data_from_sensor();
-			filtered_temp = 
-			printf("%f\n", temperature);
-
-		}
-		
-		//Capture temperature to display every 500ms
-		if(loop_count_gbl % 250 == 0) {
-			display_temp = temperature;
 			printf("Temp: %f\t FilteredTemp: %f\n", temperature, filtered_temp);
 			Kalmanfilter_C(temperature, &current_kstate);
 			filtered_temp = current_kstate.x;
+		}
+		
+		//Capture temperature to display every 500ms
+		if(loop_count_gbl % 500 == 0) {
+			display_temp = filtered_temp; 
 		}
 		
 		//Display the value caught at every 500ms interval to stabilize the 7seg display
 		update_segment_display(display_temp);
 		
 		//Launches overheating alarm if the temperature is greater than the upper threshold
-		if(temperature > OVERHEAT_TEMP) {
+		if(filtered_temp > OVERHEAT_TEMP) {
 			launch_overheat_alarm(loop_count_gbl);
 			
 			//Toggles the alarm status
@@ -249,28 +245,36 @@ void set_adc_channel (void) {
 	 * @retval None
    */
 void launch_overheat_alarm (int tick_cnt) {
-
+	
+	//If true, reset the LEDs
 	if(tick_cnt == ALARM_RESET) {
 		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15, GPIO_PIN_RESET);
+	
+	//Otherwise turn on LEDs in a rotating alarm
 	} else {
+		
+		//if the tick count is between 0 and 500, turn LED 0(Blue) on
 		if(tick_cnt >= 0 && tick_cnt < ALARM_PERIOD) {
 			
 			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_RESET);
 			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
 		}
 		
+		//if the tick count is between 500 and 1000, turn LED 1(Green) on
 		if(tick_cnt >= ALARM_PERIOD && tick_cnt < (ALARM_PERIOD*2)) {
 			
 			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
 			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
 		}
 		
+		//if the tick count is between 1000 and 1500, turn LED 2(Orange) on
 		if(tick_cnt >= (ALARM_PERIOD*2) && tick_cnt < (ALARM_PERIOD*3)) {
 			
 			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
 			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
 		}
 		
+		//if the tick count is between 1500 and 2000, turn LED 3(Red) on
 		if(tick_cnt >= (ALARM_PERIOD*3) && tick_cnt < (ALARM_PERIOD*4)) {
 			
 			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
@@ -281,7 +285,7 @@ void launch_overheat_alarm (int tick_cnt) {
 
 /**
    * @brief A function used to filter the noisy converted temperature readings from ADC
-	 * @retval filtered_temp: a float that contains the filtered temperature value
+	 * @retval temperature: a float that contains the filtered temperature value
    */
 /*void filter_temperature (float temperature) {
 	//float filtered_temp;
@@ -293,23 +297,24 @@ void launch_overheat_alarm (int tick_cnt) {
 }*/
 
 /**
-   * @brief A function used to filter the noisy converted temperature readings from ADC
-	 * @param q: process noise covariance
-	 * @param r: measurement noise covariance
-	 * @param x: estimated value
-	 * @param p: estimation error covariance
-	 * @param k: kalman gain
+   * @brief A function used to initialize the kalman filter struct
+	 * @param
 	 * @retval filtered_temp: a float that contains the filtered temperature value
    */
 void Kalmanfilter_init(void) {
-	current_kstate.q = 0.01f;
-	current_kstate.r = 0.6f;
-	current_kstate.x = 28.0f;
-	current_kstate.p = 2.0f;
-	current_kstate.k = 0.00f;
+	current_kstate.q = 0.02f; //process noise covariance
+	current_kstate.r = 0.5f; //measurement noise covariance
+	current_kstate.x = 28.0f; //estimated value
+	current_kstate.p = 2.0f; //estimation error covariance
+	current_kstate.k = 0.00f; //kalman gain
 }
 
-//The following method takes an array of measurements and filters the values using the Kalman Filter
+/**
+   * @brief A function used to filter the noisy converted temperature readings from ADC
+	 * @param measured_temp: this is the converted temperature reading input from the sensor
+   * @param kstate: pointer to the kalman filter configuration struct
+	 * @retval 
+   */
 int Kalmanfilter_C(float measured_temp, kalman_state* kstate) {	
 	kstate->p = kstate->p + kstate->q;
 	kstate->k = kstate->p / (kstate->p + kstate->r);
