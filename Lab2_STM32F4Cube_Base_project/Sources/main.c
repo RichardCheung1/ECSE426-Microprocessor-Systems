@@ -17,13 +17,14 @@
 /* Constants -----------------------------------------------------------------*/
 #define ALARM_PERIOD	500
 //#define VOLTAGE_CONVERSION(x)	(float)(x*(3.0/4096))
-#define OVERHEAT_TEMP	(float)50
+#define OVERHEAT_TEMP	(float)45
 #define ALARM_RESET -1	
 
 /* Private variables ---------------------------------------------------------*/
 ADC_InitTypeDef ADC_InitStruct;
 ADC_ChannelConfTypeDef ADC_ChannelStruct;
 GPIO_InitTypeDef GPIO_InitStruct;
+kalman_state current_kstate;
 
 /* Global variables ----------------------------------------------------------*/
 ADC_HandleTypeDef ADC1_Handle;
@@ -38,7 +39,7 @@ int main(void)
 	//Variables to store temperature
 	float temperature = 0.0f;
 	float display_temp = 0.0f;
-	float filtered_temp = 55.0f;
+	float filtered_temp = 0.0f;
 
 	//Variable to keep track of alarm status
 	int is_alarm_on = 0;
@@ -123,6 +124,10 @@ int main(void)
 	//Initialize the LCD display
 	LCD_init();
 	
+	//Initialize the Kalman Filter struct
+	Kalmanfilter_init();
+	
+	printf("This is where the temp sensing starts\n");
 	while (1){
 		HAL_GPIO_WritePin (GPIOE, GPIO_PIN_7 | GPIO_PIN_8  |GPIO_PIN_9 |GPIO_PIN_10 , GPIO_PIN_SET);
 
@@ -142,7 +147,7 @@ int main(void)
 		}
 		
 		//Measures temperature from sensor every 10ms -> 100Hz frequency
-		if (loop_count_gbl % 10 == 0) {
+		if (loop_count_gbl % 200 == 0) {
 			temperature = get_data_from_sensor();
 			filtered_temp = 
 			printf("%f\n", temperature);
@@ -151,7 +156,10 @@ int main(void)
 		
 		//Capture temperature to display every 500ms
 		if(loop_count_gbl % 250 == 0) {
-			display_temp = temperature; 
+			display_temp = temperature;
+			printf("Temp: %f\t FilteredTemp: %f\n", temperature, filtered_temp);
+			Kalmanfilter_C(temperature, &current_kstate);
+			filtered_temp = current_kstate.x;
 		}
 		
 		//Display the value caught at every 500ms interval to stabilize the 7seg display
@@ -178,8 +186,6 @@ int main(void)
 		}
 	}
 }
-
-
 
 /** System Clock Configuration */
 void SystemClock_Config(void){
@@ -239,7 +245,8 @@ void set_adc_channel (void) {
 
 /**
    * @brief A function used to dictate the rotation of the LED alarm when the processor overheats
-   * @retval None
+	 * @param tick_cnt: global loop count to help determine which LED to turn on when
+	 * @retval None
    */
 void launch_overheat_alarm (int tick_cnt) {
 
@@ -272,29 +279,48 @@ void launch_overheat_alarm (int tick_cnt) {
 	}
 }
 
+/**
+   * @brief A function used to filter the noisy converted temperature readings from ADC
+	 * @retval filtered_temp: a float that contains the filtered temperature value
+   */
+/*void filter_temperature (float temperature) {
+	//float filtered_temp;
+	
+	//call function Kalmanfilter_C
+	Kalmanfilter_C(temperature, &current_kstate);
+	
+	//return filtered_temp;
+}*/
 
 /**
-   * @brief A function used to filter the sensor data from ADC
-   * @retval None
+   * @brief A function used to filter the noisy converted temperature readings from ADC
+	 * @param q: process noise covariance
+	 * @param r: measurement noise covariance
+	 * @param x: estimated value
+	 * @param p: estimation error covariance
+	 * @param k: kalman gain
+	 * @retval filtered_temp: a float that contains the filtered temperature value
    */
-float filter_sensor_data (float voltage) {
-	float filtered_voltage;
-	
-	return filtered_voltage;
+void Kalmanfilter_init(void) {
+	current_kstate.q = 0.01f;
+	current_kstate.r = 0.6f;
+	current_kstate.x = 28.0f;
+	current_kstate.p = 2.0f;
+	current_kstate.k = 0.00f;
 }
 
 //The following method takes an array of measurements and filters the values using the Kalman Filter
-int Kalmanfilter_C(float measured_voltage, kalman_state* kstate) {	
+int Kalmanfilter_C(float measured_temp, kalman_state* kstate) {	
 	kstate->p = kstate->p + kstate->q;
 	kstate->k = kstate->p / (kstate->p + kstate->r);
-	kstate->x = kstate->x + kstate->k * (measured_voltage-kstate->x);
+	kstate->x = kstate->x + kstate->k * (measured_temp-kstate->x);
 
 	//The following conditional checks if kstate->x is not a number
 	if (kstate->x != kstate->x) {
 		printf("An error has occured -NaN value was found"); 
 		return 1;
 	}
-
+	
 	kstate->p = (1-kstate->k) * kstate->p;
 	return 0; 
 }
