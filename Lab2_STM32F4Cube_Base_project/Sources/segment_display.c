@@ -25,15 +25,57 @@
 // data 0							1								2						3							4							5								6					7
 void LCD_init(void) 
 {
-	//set  E & RS bit to LOW
-	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_2| GPIO_PIN_1, GPIO_PIN_RESET); 
+	int i ;
+	//reset all pins
+	HAL_GPIO_WritePin( GPIOE,  GPIO_PIN_7 | GPIO_PIN_8  | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14, GPIO_PIN_RESET); 
+	//Clear display
+	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
 	
-	//display all + blick and underline
-	HAL_GPIO_WritePin (GPIOE, GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin (GPIOE, GPIO_PIN_7 | GPIO_PIN_8  |GPIO_PIN_9 |GPIO_PIN_10 , GPIO_PIN_SET);
+	// delay
+	for ( i =0; i < 500 ; i++ ){}
+	//Display & cursor HOME
+	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_8, GPIO_PIN_SET);
 
+	// delay
+	for ( i =0; i < 500 ; i++ ){}
+	//Character Entry Mode
+	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_9 , GPIO_PIN_SET);
+	// delay
+	for ( i =0; i < 500 ; i++ ){}
+
+	// display ON
+	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_10 , GPIO_PIN_SET); 
+	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_7 | GPIO_PIN_8 , GPIO_PIN_RESET);
+	// delay
+	for ( i =0; i < 500 ; i++ ){}
+
+	//display cursor Shift
+	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_11 , GPIO_PIN_SET); 
+	// delay
+	for ( i =0; i < 500 ; i++ ){}
+		
+	//function set
+	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_12, GPIO_PIN_SET); 
+	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_10 | GPIO_PIN_9, GPIO_PIN_RESET) ;
+		
+	// delay
+	for ( i =0; i < 500 ; i++ ){}
+}
+
+//function that clear the LCD display
+void LCD_clear_display (void) 
+{
+		int i ;
+
+	//reset all pins
+	HAL_GPIO_WritePin( GPIOE,  GPIO_PIN_7 | GPIO_PIN_8  | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14, GPIO_PIN_RESET); 
+	//Clear display
+	HAL_GPIO_WritePin( GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
+	
+	for ( i =0; i < 500 ; i++ ){}
 
 }
+
 
 
 //updates the segment display in the format of XY.Z by using the multiplexing

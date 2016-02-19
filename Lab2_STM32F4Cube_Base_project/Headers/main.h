@@ -53,6 +53,7 @@ typedef struct stateInfo{
 /* Exported ------------------------------------------------------------------*/
 extern ADC_HandleTypeDef ADC1_Handle;
 extern int ticks; 
+extern int loop_count_gbl;
 //extern int display_ticks; 
 
 /* Private function prototypes -----------------------------------------------*/
@@ -61,6 +62,7 @@ void set_adc_channel (void);
 float filter_sensor_data (float voltage);
 void launch_overheat_alarm (int tick_cnt);
 int Kalmanfilter_C(float measured_voltage, kalman_state* kstate);
+
 
 #endif /* __MAIN_H */
 

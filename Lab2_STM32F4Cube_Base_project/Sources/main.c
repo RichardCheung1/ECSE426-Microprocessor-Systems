@@ -124,7 +124,8 @@ int main(void)
 	LCD_init();
 	
 	while (1){
-		
+		HAL_GPIO_WritePin (GPIOE, GPIO_PIN_7 | GPIO_PIN_8  |GPIO_PIN_9 |GPIO_PIN_10 , GPIO_PIN_SET);
+
 		//If SysTick_Handler is called, wait as there is an interrupt
 		while(!ticks);
 
@@ -143,10 +144,13 @@ int main(void)
 		//Measures temperature from sensor every 10ms -> 100Hz frequency
 		if (loop_count_gbl % 10 == 0) {
 			temperature = get_data_from_sensor();
+			filtered_temp = 
+			printf("%f\n", temperature);
+
 		}
 		
 		//Capture temperature to display every 500ms
-		if(loop_count_gbl % 500 == 0) {
+		if(loop_count_gbl % 250 == 0) {
 			display_temp = temperature; 
 		}
 		
@@ -154,7 +158,7 @@ int main(void)
 		update_segment_display(display_temp);
 		
 		//Launches overheating alarm if the temperature is greater than the upper threshold
-		if(filtered_temp > OVERHEAT_TEMP) {
+		if(temperature > OVERHEAT_TEMP) {
 			launch_overheat_alarm(loop_count_gbl);
 			
 			//Toggles the alarm status
