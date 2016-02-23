@@ -17,7 +17,7 @@
 /* Constants -----------------------------------------------------------------*/
 #define ALARM_PERIOD	500
 //#define VOLTAGE_CONVERSION(x)	(float)(x*(3.0/4096))
-#define OVERHEAT_TEMP	(float)37.0
+#define OVERHEAT_TEMP	(float)50.0
 #define ALARM_RESET -1	
 
 /* Private variables ---------------------------------------------------------*/
