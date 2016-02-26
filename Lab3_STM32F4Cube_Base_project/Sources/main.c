@@ -23,6 +23,7 @@ void SystemClock_Config	(void);
 
 int main(void)
 {	
+	int i; 
   /* MCU Configuration----------------------------------------------------------*/
 
   HAL_Init();
@@ -34,6 +35,9 @@ int main(void)
 
 	__HAL_RCC_GPIOA_CLK_ENABLE();
 	__HAL_RCC_GPIOC_CLK_ENABLE();
+	__HAL_RCC_GPIOD_CLK_ENABLE();
+	__HAL_RCC_GPIOE_CLK_ENABLE();
+
 	
 	//Configure GPIOC for the 4 select lines
 	GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3;
@@ -48,11 +52,15 @@ int main(void)
 	GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
 	GPIO_InitStruct.Pull = GPIO_NOPULL; 
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-	
+		
 	while (1){
 		//update_segment_display(2.02f);
+		i =0;
+
 		
-		
+		while (i < 500) {
+			i++;
+		};
 	}
 }
 

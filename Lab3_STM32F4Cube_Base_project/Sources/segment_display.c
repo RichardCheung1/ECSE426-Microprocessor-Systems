@@ -5,7 +5,7 @@
 												 7 segment display
 	* Author						 : Richard Cheung, Taha Saifuddin
 	* Version            : 1.0.0
-	* Date							 : February 19th, 2016
+	* Date							 : February 25th, 2016
   ******************************************************************************
   */
 	
