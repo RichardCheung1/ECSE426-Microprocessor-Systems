@@ -13,6 +13,7 @@
 #include "supporting_functions.h"
 #include "lis3dsh.h"
 #include "segment_display.h"
+#include "timer.h"
 
 /* Private variables ---------------------------------------------------------*/
 GPIO_InitTypeDef GPIO_InitStruct;
@@ -32,12 +33,10 @@ int main(void)
   SystemClock_Config();
 	
   /* Initialize all configured peripherals */
-
 	__HAL_RCC_GPIOA_CLK_ENABLE();
 	__HAL_RCC_GPIOC_CLK_ENABLE();
 	__HAL_RCC_GPIOD_CLK_ENABLE();
 	__HAL_RCC_GPIOE_CLK_ENABLE();
-
 	
 	//Configure GPIOC for the 4 select lines
 	GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3;
@@ -53,6 +52,9 @@ int main(void)
 	GPIO_InitStruct.Pull = GPIO_NOPULL; 
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 		
+	//configure tim3
+	TIM_Init(); 
+	
 	while (1){
 		//update_segment_display(2.02f);
 		i =0;
@@ -115,4 +117,6 @@ void SystemClock_Config(void){
 void assert_failed(uint8_t* file, uint32_t line){
 }
 #endif
+
+
 

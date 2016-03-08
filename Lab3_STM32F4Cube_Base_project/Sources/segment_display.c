@@ -154,7 +154,7 @@ void display_number(int number, int decimal)
    * @brief A function used to set all segments to GPIO_PIN_RESET
 	 * @retval none
    */
-void clear_segment_pin () 
+void clear_segment_pin (void) 
 {
 	HAL_GPIO_WritePin (GPIOA , GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2| GPIO_PIN_3 |GPIO_PIN_4 |GPIO_PIN_5 |GPIO_PIN_6 |GPIO_PIN_7 , GPIO_PIN_RESET); 			
 }
@@ -164,7 +164,13 @@ void clear_segment_pin ()
 	 * @retval none
    */
 //set all select digit to GPIO_PIN_RESET
-void clear_select_pin () 
+void clear_select_pin (void) 
 {
 	HAL_GPIO_WritePin (GPIOC , GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2| GPIO_PIN_3, GPIO_PIN_RESET); 			
 }
+
+//code this later, calling this method will overwrite the corresponding function in stm32f4xx_hal_tim.c
+//void HAL_TIM_IRQHandler(TIM_HandleTypeDef *htim)
+//{
+//	
+//}

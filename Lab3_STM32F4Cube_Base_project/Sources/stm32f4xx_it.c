@@ -40,6 +40,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f4xx_it.h"
+#include "timer.h"
 
 /** @addtogroup STM32F4xx_HAL_Examples
   * @{
@@ -156,6 +157,24 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
 	HAL_IncTick();
+}
+
+void TIM3_IRQHandler(void)
+{
+	//42MHz
+	//calls the TIM handler function in segment_display.c
+	
+	//In case other interrupts are also running
+	if (__HAL_TIM_GET_FLAG(&TIM3_Handle, TIM_FLAG_UPDATE) != RESET)      
+    {
+        if (__HAL_TIM_GET_ITSTATUS(&TIM3_Handle, TIM_IT_UPDATE) != RESET)
+        {
+            __HAL_TIM_CLEAR_FLAG(&TIM3_Handle, TIM_FLAG_UPDATE);
+					
+						printf("dsa\n"); 
+
+        }
+    }
 }
 
 /******************************************************************************/
