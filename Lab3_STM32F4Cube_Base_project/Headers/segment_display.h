@@ -20,7 +20,6 @@ extern void update_segment_display(float f);
 extern void clear_segment_pin(void);
 extern void clear_select_pin(void); 
 
-
 /* Private functions -------------------------------------------------------- */
 void display_number(int number, int decimal);
 int get_decimal_position(float f) ;

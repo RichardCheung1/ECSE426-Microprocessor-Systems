@@ -42,6 +42,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
 
+
 /* Exported types ------------------------------------------------------------*/
 extern  GPIO_InitTypeDef GPIO_InitStruct;
 

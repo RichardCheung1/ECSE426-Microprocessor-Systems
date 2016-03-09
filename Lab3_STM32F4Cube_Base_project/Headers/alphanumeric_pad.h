@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
-  * File Name          : segment_display.h
-  * Description        : Segment display functions that can be used by other classes
+  * File Name          : alphanumeric_pad.h
+  * Description        : 
 	* Author						 : Taha Saifuddin, Richard Cheung
 	* Version            : 1.0.0
 	* Date							 : February 19th, 2016
@@ -13,6 +13,7 @@
 
 #include "stm32f4xx_hal.h"
 #include "main.h"
+#include "timer.h"
 
 
 /* Exported functions ------------------------------------------------------- */
@@ -21,5 +22,7 @@
 /* Private functions -------------------------------------------------------- */
 int get_col(void);
 int get_row(void);
+char get_key(void) ;
+void key_fsm(void);
 
 #endif /* __ALPHANUMERIC_PAD_H */

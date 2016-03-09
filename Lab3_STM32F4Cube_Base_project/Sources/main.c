@@ -9,11 +9,11 @@
   */
 	
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx_hal.h"
 #include "supporting_functions.h"
 #include "lis3dsh.h"
 #include "segment_display.h"
 #include "timer.h"
+#include "alphanumeric_pad.h"
 
 /* Private variables ---------------------------------------------------------*/
 GPIO_InitTypeDef GPIO_InitStruct;
@@ -56,10 +56,14 @@ int main(void)
 	TIM_Init(); 
 	
 	while (1){
-		//update_segment_display(2.02f);
-		i =0;
 
+		i =0;
 		
+
+
+	get_key();
+		
+		//update_segment_display(2.02f);
 		while (i < 500) {
 			i++;
 		};

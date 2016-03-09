@@ -13,7 +13,7 @@
 TIM_HandleTypeDef TIM3_Handle;
 
 
-void TIM_Init(void) 
+void TIM_Init() 
 {
 	__TIM3_CLK_ENABLE();
 	//configure TIM3_Handle
