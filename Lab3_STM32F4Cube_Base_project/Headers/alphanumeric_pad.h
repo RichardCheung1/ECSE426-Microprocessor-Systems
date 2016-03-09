@@ -23,6 +23,6 @@
 int get_col(void);
 int get_row(void);
 char get_key(void) ;
-void key_fsm(void);
+void debouncer(void);
 
 #endif /* __ALPHANUMERIC_PAD_H */

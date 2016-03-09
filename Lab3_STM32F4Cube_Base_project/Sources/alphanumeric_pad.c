@@ -34,12 +34,12 @@ char get_key()
 	column = get_col();
 	row = get_row();
 	
-	key_fsm();
-	printf("%c %d%d\n", key, row, column);
+	debouncer();
+	//printf("%c %d%d\n", key, row, column);
 	return key;
 }
 
-void key_fsm()
+void debouncer()
 {
 	//printf("%d\n", keypad_state);
 	switch(keypad_state){
