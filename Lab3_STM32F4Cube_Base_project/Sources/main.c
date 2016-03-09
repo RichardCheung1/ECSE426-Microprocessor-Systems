@@ -9,15 +9,10 @@
   */
 	
 /* Includes ------------------------------------------------------------------*/
-#include "supporting_functions.h"
-#include "lis3dsh.h"
-#include "segment_display.h"
-#include "timer.h"
-#include "alphanumeric_pad.h"
+#include "main.h"
 
 /* Private variables ---------------------------------------------------------*/
 GPIO_InitTypeDef GPIO_InitStruct;
-
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config	(void);
@@ -38,6 +33,10 @@ int main(void)
 	__HAL_RCC_GPIOD_CLK_ENABLE();
 	__HAL_RCC_GPIOE_CLK_ENABLE();
 	
+	//Initialize the Accelerometer and the external interrup line 0
+	configure_init_accelerometer();
+	configure_enable_EXTI0_interrupt_line();
+	
 	//Configure GPIOC for the 4 select lines
 	GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -51,22 +50,21 @@ int main(void)
 	GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
 	GPIO_InitStruct.Pull = GPIO_NOPULL; 
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-		
+	
+	
 	//configure tim3
 	TIM_Init(); 
 	
 	while (1){
-
+	/*
 		i =0;
-		
 
-
-	get_key();
+		get_key();
 		
 		//update_segment_display(2.02f);
 		while (i < 500) {
 			i++;
-		};
+		};*/
 	}
 }
 
@@ -107,6 +105,20 @@ void SystemClock_Config(void){
 
   /* SysTick_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	int i;
+	float* acceleration_reading;
+	LIS3DSH_ReadACC(acceleration_reading);
+	
+	printf("the value is %f\n", acceleration_reading[2]);
+	/*for(i = 0; i < 3; i++)
+	{
+		printf("the value is %f\n", acceleration_reading[i]);
+	}
+	printf("\n\n");*/
 }
 
 #ifdef USE_FULL_ASSERT

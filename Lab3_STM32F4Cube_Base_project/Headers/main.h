@@ -41,10 +41,16 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
-
+#include "LIS3DSH.h"
+#include "supporting_functions.h"
+#include "lis3dsh.h"
+#include "segment_display.h"
+#include "timer.h"
+#include "alphanumeric_pad.h"
+#include "accelerometer.h"
 
 /* Exported types ------------------------------------------------------------*/
-extern  GPIO_InitTypeDef GPIO_InitStruct;
+extern GPIO_InitTypeDef GPIO_InitStruct;
 
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
