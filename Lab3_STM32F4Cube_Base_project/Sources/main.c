@@ -76,7 +76,7 @@ int main(void)
 		if(EXTI0_flag_value == INTERRUPT_ACTIVE_FLAG) {
 			
 			//Get the accelerometer readings
-			get_filter_acceleration();
+			get_calibrated_acceleration();
 			
 			//Reset the flag
 			EXTI0_flag_value = 0;

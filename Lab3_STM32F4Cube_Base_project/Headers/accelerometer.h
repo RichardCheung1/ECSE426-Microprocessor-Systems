@@ -24,7 +24,7 @@ typedef struct stateInfo{
 /* Exported functions ------------------------------------------------------- */
 extern void configure_init_accelerometer(void);
 extern void configure_interrupt_line(void);
-extern void get_filter_acceleration(void);
+extern void get_calibrated_acceleration(void);
 extern void Kalmanfilter_init(void);
 
 #endif /** ACCELEROMETER_H */

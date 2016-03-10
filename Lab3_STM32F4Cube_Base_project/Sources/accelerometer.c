@@ -11,6 +11,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "accelerometer.h"
+#include "math.h"
 
 /* Private variables ---------------------------------------------------------*/
 LIS3DSH_InitTypeDef LIS3DSH_InitStruct;
@@ -21,11 +22,25 @@ kalman_state y_kstate;
 kalman_state z_kstate;
 float acceleration_reading[3];		
 float acceleration_filtered[3];
+float acceleration_normalized[3];
 int i;
+float calibration_param_matrix[4][3] = {
+	{0.975054748, -0.0182180993, -0.000305652774},
+	{-0.0307680088, 1.00024108, -0.00438213129},
+	{-0.00617881222, -0.00113744427, 0.963388786},
+	{0.00214820029, 0.00162097280, -0.0131357405}
+};/*
+float calibration_param_matrix[4][3] = {
+	{0.9932,-0.0189,0.0662},
+	{0.0170, 0.9770,0.0493},
+	{-0.0026,-0.01717,0.9498},
+	{0.0023, -0.0051,-0.0495}
+};*/
 
 /* Private function prototypes -----------------------------------------------*/
 void print_filtered_acceleration(void);
 int Kalmanfilter_C(float measured_acceleration, kalman_state* kstate);
+void calculate_angles(void);
 
 /**
    * @brief A function used to configure and init the accelerometer
@@ -35,7 +50,7 @@ int Kalmanfilter_C(float measured_acceleration, kalman_state* kstate);
 void configure_init_accelerometer(void)
 {
 	//Configure the accelerometer initialization struct
-	LIS3DSH_InitStruct.Power_Mode_Output_DataRate = LIS3DSH_DATARATE_100;        /* Ppower down or /active mode with output data rate 3.125 / 6.25 / 12.5 / 25 / 50 / 100 / 400 / 800 / 1600 HZ */
+	LIS3DSH_InitStruct.Power_Mode_Output_DataRate = LIS3DSH_DATARATE_25;        /* Ppower down or /active mode with output data rate 3.125 / 6.25 / 12.5 / 25 / 50 / 100 / 400 / 800 / 1600 HZ */
   LIS3DSH_InitStruct.Axes_Enable = LIS3DSH_XYZ_ENABLE;                        /* Axes enable */
   LIS3DSH_InitStruct.Continous_Update = LIS3DSH_ContinousUpdate_Disabled;			/* Block or update Low/High registers of data until all data is read */
 	LIS3DSH_InitStruct.AA_Filter_BW = LIS3DSH_AA_BW_50;													/* Choose anti-aliasing filter BW 800 / 400 / 200 / 50 Hz*/
@@ -84,24 +99,24 @@ void configure_interrupt_line(void)
 void Kalmanfilter_init(void) {
 	
 	//Kalman state struct to filter Ax values
-	x_kstate.q = 0.05f; //process noise covariance
-	x_kstate.r = 1.0f; //measurement noise covariance
+	x_kstate.q = 50.0f; //process noise covariance
+	x_kstate.r = 0.01f; //measurement noise covariance
 	x_kstate.x = 0.0f; //estimated value
-	x_kstate.p = 1.0f; //estimation error covariance
+	x_kstate.p = 1500.0f; //estimation error covariance
 	x_kstate.k = 0.0f; //kalman gain
 	
 	//Kalman state struct to filter Ay values
-	y_kstate.q = 0.1f; //process noise covariance
-	y_kstate.r = 1.0f; //measurement noise covariance
+	y_kstate.q = 50.0f; //process noise covariance
+	y_kstate.r = 0.01f; //measurement noise covariance
 	y_kstate.x = 0.0f; //estimated value
-	y_kstate.p = 1.0f; //estimation error covariance
+	y_kstate.p = 1500.0f; //estimation error covariance
 	y_kstate.k = 0.0f; //kalman gain
 	
 	//Kalman state struct to filter Az values
-	z_kstate.q = 0.05f; //process noise covariance
-	z_kstate.r = 1.0f; //measurement noise covariance
-	z_kstate.x = 1.0f; //estimated value
-	z_kstate.p = 1.0f; //estimation error covariance
+	z_kstate.q = 50.0f; //process noise covariance
+	z_kstate.r = 0.05f; //measurement noise covariance
+	z_kstate.x = 1000.0f; //estimated value
+	z_kstate.p = 1500.0f; //estimation error covariance
 	z_kstate.k = 0.0f; //kalman gain
 }
 
@@ -132,8 +147,10 @@ int Kalmanfilter_C(float measured_acceleration, kalman_state* kstate) {
    * @param none
 	 * @retval 
    */
-void get_filter_acceleration(void)
+void get_calibrated_acceleration(void)
 {	
+	int j;
+	
 	//Get the accelerometer readings
 	LIS3DSH_ReadACC(acceleration_reading);
 	
@@ -142,13 +159,25 @@ void get_filter_acceleration(void)
 	Kalmanfilter_C(acceleration_reading[1], &y_kstate);
 	Kalmanfilter_C(acceleration_reading[2], &z_kstate);
 	
-	//Save the filtered values
+	//Save the filtered Ax, Ay, Az values
 	acceleration_filtered[0] = x_kstate.x;
 	acceleration_filtered[1] = y_kstate.x;
 	acceleration_filtered[2] = z_kstate.x;
+	//acceleration_filtered[3] = 1; //needed for the normalization calculation
+	
+	//Calculate the normalized acceleration values
+	for(i = 0; i < 3; i++) {
+		for(j = 0; j < 3; j++) {
+			acceleration_normalized[i] += acceleration_filtered[j]*calibration_param_matrix[j][i];
+		}
+		//adding 1*ACC10/20/30
+		acceleration_normalized[i] += calibration_param_matrix[4][i];
+	}
 	
 	//Print the filtered values
 	print_filtered_acceleration();
+	
+	//calculate_angles();
 }
 
 /**
@@ -166,4 +195,21 @@ void print_filtered_acceleration(void)
 	{
 		printf("%f,", acceleration_filtered[i]);
 	}
+	
+	printf("\n");
+}
+
+/**
+   * @brief A function used to print filtered accelerometer readings
+	 * @param none
+   * @param none
+	 * @retval 
+   */
+void calculate_angles(void)
+{
+	float pitch = atan2(acceleration_normalized[0], sqrt(acceleration_normalized[1]*acceleration_normalized[1] + acceleration_normalized[2]*acceleration_normalized[2])) * 180/ 3.14159265;
+	//float roll = atan2(acceleration_normalized[1], sqrt(acceleration_normalized[0]*acceleration_normalized[0] + acceleration_normalized[2]*acceleration_normalized[2])) * 180/ 3.14159265;
+	
+	printf("Pitch angle %f\n", pitch);
+	//printf("Roll angle %f\n", roll);
 }
