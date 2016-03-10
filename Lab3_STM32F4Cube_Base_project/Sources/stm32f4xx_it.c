@@ -165,7 +165,7 @@ void TIM3_IRQHandler(void)
 	//calls the TIM handler function in segment_display.c
 	
 	//In case other interrupts are also running
-	if (__HAL_TIM_GET_FLAG(&TIM3_Handle, TIM_FLAG_UPDATE) != RESET)      
+	/*if (__HAL_TIM_GET_FLAG(&TIM3_Handle, TIM_FLAG_UPDATE) != RESET)      
     {
         if (__HAL_TIM_GET_ITSTATUS(&TIM3_Handle, TIM_IT_UPDATE) != RESET)
         {
@@ -174,9 +174,8 @@ void TIM3_IRQHandler(void)
 						printf("dsa\n"); 
 
         }
-    }
-		
-		
+    }*/
+	HAL_TIM_IRQHandler(&TIM3_Handle);
 }
 
 void EXTI0_IRQHandler(void)

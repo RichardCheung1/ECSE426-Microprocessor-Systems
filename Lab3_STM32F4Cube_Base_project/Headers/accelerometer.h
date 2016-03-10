@@ -12,11 +12,19 @@
 #ifndef ACCELEROMETER_H
 #define ACCELEROMETER_H
 
-/* Define to prevent recursive inclusion -------------------------------------*/
+/* Includes ------------------------------------------------------------------*/
 #include "main.h"
+
+/* Structs -------------------------------------------------------------------*/
+typedef struct stateInfo{
+	float q, r, x, p, k;
+}kalman_state;
+
 
 /* Exported functions ------------------------------------------------------- */
 extern void configure_init_accelerometer(void);
-extern void configure_enable_EXTI0_interrupt_line(void);
+extern void configure_interrupt_line(void);
+extern void get_filter_acceleration(void);
+extern void Kalmanfilter_init(void);
 
 #endif /** ACCELEROMETER_H */

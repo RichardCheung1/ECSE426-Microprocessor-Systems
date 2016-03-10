@@ -11,32 +11,36 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
+#define INTERRUPT_ACTIVE_FLAG 1
+
 /* Private variables ---------------------------------------------------------*/
 GPIO_InitTypeDef GPIO_InitStruct;
+int EXTI0_flag_value;
+int TIM3_flag_value;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config	(void);
 
 int main(void)
-{	
-	int i; 
+ {	
+	//int i; 
   /* MCU Configuration----------------------------------------------------------*/
-
-  HAL_Init();
+  
+	HAL_Init();
 
   /* Configure the system clock */
   SystemClock_Config();
 	
   /* Initialize all configured peripherals */
-	__HAL_RCC_GPIOA_CLK_ENABLE();
-	__HAL_RCC_GPIOC_CLK_ENABLE();
-	__HAL_RCC_GPIOD_CLK_ENABLE();
+	//__HAL_RCC_GPIOA_CLK_ENABLE();
+	//__HAL_RCC_GPIOC_CLK_ENABLE();
+	//__HAL_RCC_GPIOD_CLK_ENABLE();
 	__HAL_RCC_GPIOE_CLK_ENABLE();
 	
 	//Initialize the Accelerometer and the external interrup line 0
 	configure_init_accelerometer();
-	configure_enable_EXTI0_interrupt_line();
-	
+	configure_interrupt_line();
+	/*
 	//Configure GPIOC for the 4 select lines
 	GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -49,11 +53,13 @@ int main(void)
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
 	GPIO_InitStruct.Pull = GPIO_NOPULL; 
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-	
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);*/
 	
 	//configure tim3
-	TIM_Init(); 
+	//TIM_Init(); 
+	
+	//Initialize the kalman filter structs
+	Kalmanfilter_init();
 	
 	while (1){
 	/*
@@ -65,6 +71,23 @@ int main(void)
 		while (i < 500) {
 			i++;
 		};*/
+		
+		//If the EXTI0 callback function is called and flag is set to active, read accelerometer values
+		if(EXTI0_flag_value == INTERRUPT_ACTIVE_FLAG) {
+			
+			//Get the accelerometer readings
+			get_filter_acceleration();
+			
+			//Reset the flag
+			EXTI0_flag_value = 0;
+		}
+		
+		//If the TIM3 callback function is called and flag is set to active, update the 7segment display
+		/*if(TIM3_flag_value == INTERRUPT_ACTIVE_FLAG) {
+			
+			//Reset the flag
+			TIM3_flag_value = 0;
+		}*/
 	}
 }
 
@@ -107,18 +130,24 @@ void SystemClock_Config(void){
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 }
 
+/**
+   * @brief Sets the TIM3 interrupt flag to 1
+   * @param uint16_t GPIO_Pin
+   * @retval None
+   */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	int i;
-	float* acceleration_reading;
-	LIS3DSH_ReadACC(acceleration_reading);
-	
-	printf("the value is %f\n", acceleration_reading[2]);
-	/*for(i = 0; i < 3; i++)
-	{
-		printf("the value is %f\n", acceleration_reading[i]);
-	}
-	printf("\n\n");*/
+	EXTI0_flag_value = 1;
+}
+
+/**
+   * @brief Sets the TIM3 interrupt flag to 1
+   * @param *htim
+   * @retval None
+   */
+void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
+{
+	TIM3_flag_value = 1;
 }
 
 #ifdef USE_FULL_ASSERT

@@ -27,11 +27,9 @@ void TIM_Init()
 	HAL_TIM_Base_Init(&TIM3_Handle);
 	HAL_TIM_Base_Start_IT(&TIM3_Handle);
 	
-	
 	HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_0);
 	HAL_NVIC_EnableIRQ(TIM3_IRQn);
-	HAL_NVIC_SetPriority(TIM3_IRQn, (uint32_t) 1, (uint32_t) 4); 
-	
+	HAL_NVIC_SetPriority(TIM3_IRQn, 0, 1);
 }
 
 
