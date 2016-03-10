@@ -53,7 +53,7 @@ void configure_init_accelerometer(void)
 	LIS3DSH_InitStruct.Power_Mode_Output_DataRate = LIS3DSH_DATARATE_25;        /* Ppower down or /active mode with output data rate 3.125 / 6.25 / 12.5 / 25 / 50 / 100 / 400 / 800 / 1600 HZ */
   LIS3DSH_InitStruct.Axes_Enable = LIS3DSH_XYZ_ENABLE;                        /* Axes enable */
   LIS3DSH_InitStruct.Continous_Update = LIS3DSH_ContinousUpdate_Disabled;			/* Block or update Low/High registers of data until all data is read */
-	LIS3DSH_InitStruct.AA_Filter_BW = LIS3DSH_AA_BW_50;													/* Choose anti-aliasing filter BW 800 / 400 / 200 / 50 Hz*/
+	LIS3DSH_InitStruct.AA_Filter_BW = LIS3DSH_AA_BW_800;													/* Choose anti-aliasing filter BW 800 / 400 / 200 / 50 Hz*/
   LIS3DSH_InitStruct.Full_Scale = LIS3DSH_FULLSCALE_2;                        /* Full scale 2 / 4 / 6 / 8 / 16 g */
   LIS3DSH_InitStruct.Self_Test = LIS3DSH_SELFTEST_NORMAL;                     /* Self test */
 	
@@ -65,7 +65,7 @@ void configure_init_accelerometer(void)
 	//Enable the interrupt line
 	HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_0);
 	HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-	HAL_NVIC_SetPriority(EXTI0_IRQn, (uint32_t) 0, (uint32_t) 1);
+	HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 1);
 	
 	//Initialize the accelerometer
 	LIS3DSH_Init(&LIS3DSH_InitStruct);
@@ -85,9 +85,8 @@ void configure_interrupt_line(void)
 	//Configure GPIOE for the interrupt line
 	GPIO_InitStructx.Pin = GPIO_PIN_0;
 	GPIO_InitStructx.Mode = GPIO_MODE_IT_RISING;
-	GPIO_InitStructx.Speed = GPIO_SPEED_FREQ_LOW;
-	GPIO_InitStructx.Pull = GPIO_PULLDOWN; 
-	
+	GPIO_InitStructx.Speed = GPIO_SPEED_FREQ_HIGH;
+	GPIO_InitStructx.Pull = GPIO_NOPULL ; 
 	HAL_GPIO_Init(GPIOE, &GPIO_InitStructx);
 }
 
@@ -175,9 +174,9 @@ void get_calibrated_acceleration(void)
 	}
 	
 	//Print the filtered values
-	print_filtered_acceleration();
+	//print_filtered_acceleration();
 	
-	//calculate_angles();
+	calculate_angles();
 }
 
 /**
@@ -207,9 +206,29 @@ void print_filtered_acceleration(void)
    */
 void calculate_angles(void)
 {
-	float pitch = atan2(acceleration_normalized[0], sqrt(acceleration_normalized[1]*acceleration_normalized[1] + acceleration_normalized[2]*acceleration_normalized[2])) * 180/ 3.14159265;
-	//float roll = atan2(acceleration_normalized[1], sqrt(acceleration_normalized[0]*acceleration_normalized[0] + acceleration_normalized[2]*acceleration_normalized[2])) * 180/ 3.14159265;
+	pitch = atan2(acceleration_normalized[0], sqrt(acceleration_normalized[1]*acceleration_normalized[1] + acceleration_normalized[2]*acceleration_normalized[2])) * 180/ 3.14159265;
+	roll = atan2(acceleration_normalized[1], sqrt(acceleration_normalized[0]*acceleration_normalized[0] + acceleration_normalized[2]*acceleration_normalized[2])) * 180/ 3.14159265;
 	
+	//Normalize the angles to show within a 0 to 180 degree range
+	
+	//float roll = atan2(acceleration_normalized[0],acceleration_normalized[2]) * 180/ 3.14159265;
+	//float pitch = atan2(acceleration_normalized[1],acceleration_normalized[2]) * 180/ 3.14159265;
+
+	acceleration_normalized[0] =0 ;
+	acceleration_normalized[1] =0 ;
+	acceleration_normalized[2] =0 ;
+
 	printf("Pitch angle %f\n", pitch);
-	//printf("Roll angle %f\n", roll);
+	printf("Roll angle %f\n", roll);
+}
+
+void normalize_angles(void)
+{	
+	if(roll < 0) {
+	
+	}
+	
+	if(pitch < 0) {
+		
+	}
 }

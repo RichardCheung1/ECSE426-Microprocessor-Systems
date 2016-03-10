@@ -27,4 +27,7 @@ extern void configure_interrupt_line(void);
 extern void get_calibrated_acceleration(void);
 extern void Kalmanfilter_init(void);
 
+/* Exported Variables ------------------------------------------------------- */
+extern float pitch, roll;
+
 #endif /** ACCELEROMETER_H */

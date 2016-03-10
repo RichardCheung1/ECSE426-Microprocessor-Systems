@@ -1,10 +1,11 @@
 /**
   ******************************************************************************
   * File Name          : alphanumeric_pad.c
-  * Description        : 
+  * Description        : This class provides functionality for configuring and 
+												 controlling the alphanumeric keypad
 	* Author						 : Richard Cheung, Taha Saifuddin
 	* Version            : 1.0.0
-	* Date							 : February 26th, 2016
+	* Date							 : March 10th, 2016
   ******************************************************************************
   */
 	
@@ -13,6 +14,8 @@
 int column;
 int row;
 int keypad_state;
+int input_value; 
+int input_flag; 
 char key = ' ';
 const int IDLE = 0;
 const int DEBOUNCING = 1;
@@ -28,7 +31,19 @@ char keys[4][4] =
  {'*', '0', '#', 'D'},
 };
 
+/**
+   * @brief function to get the key pressed
+	 * @param 
+   */
+void set_input() 
+{
+	
+}
 
+/**
+   * @brief function to get the key pressed
+	 * @param 
+   */
 char get_key() 
 {
 	column = get_col();
@@ -38,7 +53,10 @@ char get_key()
 	//printf("%c %d%d\n", key, row, column);
 	return key;
 }
-
+/**
+   * @brief function to handle debouncer
+	 * @param 
+   */
 void debouncer()
 {
 	//printf("%d\n", keypad_state);
@@ -70,14 +88,15 @@ void debouncer()
 	
 	}
 }
-
-/* function to determine the column that the key is pressed, where PIN0,PIN1,PIN2,PIN3
-are respectively column 1,2,3,4
-*/
+/**
+   * @brief function to determine the column that the key is pressed, where PIN0,PIN1,PIN2,PIN3
+						are respectively column 1,2,3,4
+	 * @param 
+   */
 int get_col() 
 {
 	//first 4 pins of the alphanumeric set to INPUT
-	GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3;
+	GPIO_InitStruct.Pin = GPIO_PIN_3 | GPIO_PIN_1 | GPIO_PIN_5 | GPIO_PIN_6;
 	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
 	GPIO_InitStruct.Pull = GPIO_PULLUP; 
@@ -90,31 +109,37 @@ int get_col()
 	GPIO_InitStruct.Pull = GPIO_NOPULL; 
 	HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 	
+//		printf ("%d ", HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_3));
+//		printf ("%d ", HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_1));
+//		printf ("%d ", HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_5));
+//		printf ("%d \n ", HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_6));
 	
-	if ( HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_0) == GPIO_PIN_RESET ) {
+	
+	if ( HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_3) == GPIO_PIN_RESET ) {
 		return 0;
 	}
 	else if ( HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_1) == GPIO_PIN_RESET ) {
 		return 1;
 	}
-	else if ( HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_2) == GPIO_PIN_RESET ) {
+	else if ( HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_5) == GPIO_PIN_RESET ) {
 		return 2;
 	}
-	else if ( HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_3) == GPIO_PIN_RESET ) {
+	else if ( HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_6) == GPIO_PIN_RESET ) {
 		return 3;
 	}
 	else {
 		return -1;
 	}
 }
-
-/* function to determine the row that the key is pressed, where PIN4,PIN5,PIN6,PIN7
-are respectively row 1,2,3,4
-*/
+/**
+   * @brief function to determine the row that the key is pressed, where PIN4,PIN5,PIN6,PIN7
+						are respectively row 1,2,3,4
+	 * @param 
+   */
 int get_row() 
 {
 	//first 4 pins of the alphanumeric set to OUTPUT
-	GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3;
+	GPIO_InitStruct.Pin = GPIO_PIN_3 | GPIO_PIN_1 | GPIO_PIN_5 | GPIO_PIN_6;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
 	GPIO_InitStruct.Pull = GPIO_NOPULL; 

@@ -20,7 +20,7 @@ void update_segment_display(float f)
 {	
 	int decimal_position_one, decimal_position_ten, number;
 	int position = 0;
-	
+
 	if (f < 10){
 		decimal_position_ten =0;
 		decimal_position_one =1;
@@ -44,30 +44,32 @@ void update_segment_display(float f)
 			// first digit will be set and light while the rest is off
 			case 0:
 				display_number( number % 10, decimal_position_one);
-				HAL_GPIO_WritePin( GPIOC, GPIO_PIN_0, GPIO_PIN_SET) ;
+				HAL_GPIO_WritePin( GPIOE, GPIO_PIN_1, GPIO_PIN_SET) ;
 				delay(250);
 			break; 
 			// first digit will shut off and 2nd digit will light, other digits are still shut off
 			case 1:
 				display_number( number % 10, decimal_position_ten);
-				HAL_GPIO_WritePin( GPIOC, GPIO_PIN_1 , GPIO_PIN_SET) ;			
+				HAL_GPIO_WritePin( GPIOE, GPIO_PIN_2 , GPIO_PIN_SET) ;			
 				delay(250);
 				break;
 			
 			// third digit will light and others are shut off
 			case 2: 
 				display_number( number % 10, 0);				
-				HAL_GPIO_WritePin( GPIOC, GPIO_PIN_2, GPIO_PIN_SET) ;
+				HAL_GPIO_WritePin( GPIOE, GPIO_PIN_3, GPIO_PIN_SET) ;
 				delay(250);
 
 			break; 
 		}
-		clear_select_pin();
+		clear_select_pin(); 
 		clear_segment_pin();
-		HAL_GPIO_WritePin( GPIOC, GPIO_PIN_3, GPIO_PIN_SET) ;
-		HAL_GPIO_WritePin( GPIOA, GPIO_PIN_2, GPIO_PIN_SET) ;
+		HAL_GPIO_WritePin( GPIOE, GPIO_PIN_4, GPIO_PIN_SET) ;
+		HAL_GPIO_WritePin( GPIOA, GPIO_PIN_3, GPIO_PIN_SET) ;
+		delay(250);
 		position ++; 
-		number /= 10; 
+		number /= 10;
+		clear_segment_pin();
 	}
 }
 
@@ -93,14 +95,14 @@ int get_decimal_position(float f)
 // function that takes parameters number and decimal which turns on the appropriate pins to generate the right
 // number for the standard 7 segment display. The decimal parameter is a flag to determine if that digit have decimal. 
 //
-//SEGMENT A - GPIO_PIN_0
-//SEGMENT B - GPIO_PIN_1
-//SEGMENT C - GPIO_PIN_2
-//SEGMENT D - GPIO_PIN_3
-//SEGMENT E - GPIO_PIN_4
-//SEGMENT F - GPIO_PIN_5
-//SEGMENT G - GPIO_PIN_6
-//SEGMENT DP - GPIO_PIN_7
+//SEGMENT A - GPIO_PIN_1
+//SEGMENT B - GPIO_PIN_2
+//SEGMENT C - GPIO_PIN_3
+//SEGMENT D - GPIO_PIN_4
+//SEGMENT E - GPIO_PIN_5
+//SEGMENT F - GPIO_PIN_6
+//SEGMENT G - GPIO_PIN_7
+//SEGMENT DP - GPIO_PIN_8
 
 /**
    * @brief A function used to display a specific number using the segment pins
@@ -113,39 +115,39 @@ void display_number(int number, int decimal)
 	clear_segment_pin();
 	if (decimal) 
 	{
-		HAL_GPIO_WritePin (GPIOA, GPIO_PIN_7, GPIO_PIN_SET) ;
+		HAL_GPIO_WritePin (GPIOA, GPIO_PIN_8, GPIO_PIN_SET) ;
 	}
 	switch (number) 
 	{
 		case 0:
-			HAL_GPIO_WritePin (GPIOA, GPIO_PIN_0 |GPIO_PIN_1 |GPIO_PIN_2 |GPIO_PIN_3 |GPIO_PIN_4 | GPIO_PIN_5, GPIO_PIN_SET);
+			HAL_GPIO_WritePin (GPIOA, GPIO_PIN_1 |GPIO_PIN_2 |GPIO_PIN_3 |GPIO_PIN_4 |GPIO_PIN_5 | GPIO_PIN_6, GPIO_PIN_SET);
 			break;
 		case 1:
-			HAL_GPIO_WritePin (GPIOA , GPIO_PIN_1 | GPIO_PIN_2, GPIO_PIN_SET); 
+			HAL_GPIO_WritePin (GPIOA , GPIO_PIN_2 | GPIO_PIN_3, GPIO_PIN_SET); 
 			break;
 		case 2:
-			HAL_GPIO_WritePin (GPIOA , GPIO_PIN_0 | GPIO_PIN_1 |GPIO_PIN_6 | GPIO_PIN_4 | GPIO_PIN_3 , GPIO_PIN_SET); 
+			HAL_GPIO_WritePin (GPIOA , GPIO_PIN_1 | GPIO_PIN_2 |GPIO_PIN_7 | GPIO_PIN_5 | GPIO_PIN_4 , GPIO_PIN_SET); 
 			break;
 		case 3:
-			HAL_GPIO_WritePin (GPIOA , GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_6, GPIO_PIN_SET); 			
+			HAL_GPIO_WritePin (GPIOA , GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_7, GPIO_PIN_SET); 			
 			break;
 		case 4:
-			HAL_GPIO_WritePin (GPIOA , GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_1 | GPIO_PIN_2, GPIO_PIN_SET); 			
+			HAL_GPIO_WritePin (GPIOA , GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_2 | GPIO_PIN_3, GPIO_PIN_SET); 			
 			break;
 		case 5:
-			HAL_GPIO_WritePin (GPIOA ,GPIO_PIN_0 | GPIO_PIN_5 | GPIO_PIN_6| GPIO_PIN_2| GPIO_PIN_3, GPIO_PIN_SET); 			
+			HAL_GPIO_WritePin (GPIOA ,GPIO_PIN_1 | GPIO_PIN_6 | GPIO_PIN_7| GPIO_PIN_3| GPIO_PIN_4, GPIO_PIN_SET); 			
 			break;
 		case 6:
-			HAL_GPIO_WritePin (GPIOA , GPIO_PIN_0 | GPIO_PIN_5| GPIO_PIN_4 | GPIO_PIN_6 | GPIO_PIN_3 | GPIO_PIN_2, GPIO_PIN_SET); 			
+			HAL_GPIO_WritePin (GPIOA , GPIO_PIN_1 | GPIO_PIN_4| GPIO_PIN_5 | GPIO_PIN_7 | GPIO_PIN_6, GPIO_PIN_SET); 			
 			break;
 		case 7:
-			HAL_GPIO_WritePin (GPIOA ,GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2, GPIO_PIN_SET); 			
+			HAL_GPIO_WritePin (GPIOA ,GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, GPIO_PIN_SET); 			
 			break;
 		case 8:
-			HAL_GPIO_WritePin (GPIOA , GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2| GPIO_PIN_3 |GPIO_PIN_4 |GPIO_PIN_5 |GPIO_PIN_6, GPIO_PIN_SET); 			
+			HAL_GPIO_WritePin (GPIOA , GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3| GPIO_PIN_4 |GPIO_PIN_5 |GPIO_PIN_6 |GPIO_PIN_7, GPIO_PIN_SET); 			
 			break;
 		case 9:
-			HAL_GPIO_WritePin (GPIOA , GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 |GPIO_PIN_5 |GPIO_PIN_6, GPIO_PIN_SET); 			
+			HAL_GPIO_WritePin (GPIOA , GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 |GPIO_PIN_6 |GPIO_PIN_7, GPIO_PIN_SET); 			
 			break;
 	}
 }
@@ -156,7 +158,7 @@ void display_number(int number, int decimal)
    */
 void clear_segment_pin (void) 
 {
-	HAL_GPIO_WritePin (GPIOA , GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2| GPIO_PIN_3 |GPIO_PIN_4 |GPIO_PIN_5 |GPIO_PIN_6 |GPIO_PIN_7 , GPIO_PIN_RESET); 			
+	HAL_GPIO_WritePin (GPIOA , GPIO_PIN_8 | GPIO_PIN_1 | GPIO_PIN_2| GPIO_PIN_3 |GPIO_PIN_4 |GPIO_PIN_5 |GPIO_PIN_6 |GPIO_PIN_7 , GPIO_PIN_RESET); 			
 }
 
 /**
@@ -166,11 +168,7 @@ void clear_segment_pin (void)
 //set all select digit to GPIO_PIN_RESET
 void clear_select_pin (void) 
 {
-	HAL_GPIO_WritePin (GPIOC , GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2| GPIO_PIN_3, GPIO_PIN_RESET); 			
+	HAL_GPIO_WritePin (GPIOE , GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3| GPIO_PIN_4, GPIO_PIN_RESET); 			
 }
 
-//code this later, calling this method will overwrite the corresponding function in stm32f4xx_hal_tim.c
-//void HAL_TIM_IRQHandler(TIM_HandleTypeDef *htim)
-//{
-//	
-//}
+

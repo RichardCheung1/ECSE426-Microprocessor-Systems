@@ -17,6 +17,7 @@
 GPIO_InitTypeDef GPIO_InitStruct;
 int EXTI0_flag_value;
 int TIM3_flag_value;
+int counter;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config	(void);
@@ -34,26 +35,27 @@ int main(void)
   /* Initialize all configured peripherals */
 	//__HAL_RCC_GPIOA_CLK_ENABLE();
 	//__HAL_RCC_GPIOC_CLK_ENABLE();
-	//__HAL_RCC_GPIOD_CLK_ENABLE();
+	__HAL_RCC_GPIOD_CLK_ENABLE();
 	__HAL_RCC_GPIOE_CLK_ENABLE();
 	
 	//Initialize the Accelerometer and the external interrup line 0
 	configure_init_accelerometer();
 	configure_interrupt_line();
-	/*
-	//Configure GPIOC for the 4 select lines
-	GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
-	GPIO_InitStruct.Pull = GPIO_NOPULL; 
-	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+	 
+//	//Configure GPIOC for the 4 select lines
+//	GPIO_InitStruct.Pin = GPIO_PIN_4 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3;
+//	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+//	GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
+//	GPIO_InitStruct.Pull = GPIO_NOPULL; 
+//	HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+//	
+//	//Configure GPIOA for the segments
+//	GPIO_InitStruct.Pin = GPIO_PIN_8 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7;
+//	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+//	GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
+//	GPIO_InitStruct.Pull = GPIO_NOPULL; 
+//	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 	
-	//Configure GPIOA for the segments
-	GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
-	GPIO_InitStruct.Pull = GPIO_NOPULL; 
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);*/
 	
 	//configure tim3
 	//TIM_Init(); 
@@ -62,15 +64,12 @@ int main(void)
 	Kalmanfilter_init();
 	
 	while (1){
-	/*
-		i =0;
+	
+		//i =0;
 
-		get_key();
+		//get_key();
 		
 		//update_segment_display(2.02f);
-		while (i < 500) {
-			i++;
-		};*/
 		
 		//If the EXTI0 callback function is called and flag is set to active, read accelerometer values
 		if(EXTI0_flag_value == INTERRUPT_ACTIVE_FLAG) {
@@ -83,11 +82,12 @@ int main(void)
 		}
 		
 		//If the TIM3 callback function is called and flag is set to active, update the 7segment display
-		/*if(TIM3_flag_value == INTERRUPT_ACTIVE_FLAG) {
-			
+		if(TIM3_flag_value == INTERRUPT_ACTIVE_FLAG) {
+				//TODO
+		
 			//Reset the flag
 			TIM3_flag_value = 0;
-		}*/
+		}
 	}
 }
 
@@ -137,7 +137,12 @@ void SystemClock_Config(void){
    */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	EXTI0_flag_value = 1;
+	if (counter == 4)
+	{		
+		EXTI0_flag_value = 1;
+		counter = 0 ;
+	}
+	counter++;
 }
 
 /**
