@@ -214,8 +214,8 @@ void calculate_angles(void)
 	
 	//Normalize the angles to show within a 0 to 180 degree range
 	
-	roll = atan2(acceleration_normalized[0],acceleration_normalized[2]) * 180/ 3.14159265;
-	pitch = atan2(acceleration_normalized[1],acceleration_normalized[2]) * 180/ 3.14159265;
+	pitch = atan2(acceleration_normalized[0],acceleration_normalized[2]) * 180/ 3.14159265;
+	roll = atan2(acceleration_normalized[1],acceleration_normalized[2]) * 180/ 3.14159265;
 	
 	//reinitialize the normalized array
 	acceleration_normalized[0] =0 ;

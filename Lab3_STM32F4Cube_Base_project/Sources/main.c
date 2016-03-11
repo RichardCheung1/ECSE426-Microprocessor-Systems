@@ -19,6 +19,7 @@ int EXTI0_flag_value;
 int TIM3_flag_value;
 int counter;
 int TIM3_counter;
+int segment_counter;
 float threshold; 
 
 /* Private function prototypes -----------------------------------------------*/
@@ -65,11 +66,11 @@ int main(void)
 				input_value = 0;
 				printf("%s", "Inputted value too high must be less than 180!\n");
 			}
+			printf ("threshold : %f\n", threshold); 
 			threshold = input_value;
 			input_value = 0;
 			input_flag =0 ;
 		}
-		printf ("threshold : %f\n", threshold); 
 
 		//If the EXTI0 callback function is called and flag is set to active, read accelerometer values
 		if(EXTI0_flag_value == INTERRUPT_ACTIVE_FLAG) {
@@ -83,10 +84,14 @@ int main(void)
 		
 		//If the TIM3 callback function is called and flag is set to active, update the 7segment display
 		if(TIM3_flag_value == INTERRUPT_ACTIVE_FLAG) {
-
+			segment_counter ++;
 			//printf("Pitch angle %f\n", pitch);
 			//printf("Roll angle %f\n", roll);
-			update_segment_display(fabs(roll));
+			if (segment_counter % 250) {
+				update_segment_display(fabs(roll));
+				segment_counter =0; 
+			}
+			
 			//Reset the flag
 			TIM3_flag_value = 0;
 		}

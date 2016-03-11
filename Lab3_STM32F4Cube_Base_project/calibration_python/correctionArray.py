@@ -56,9 +56,11 @@ w = np.append(w,zUpMatrix, 0)
 w = np.append(w,zDownMatrix, 0)
 
 W = np.array(w)
+ones = np.vstack(np.repeat(1,3300))
+new_W = np.append(W, ones, 1)
 
-W_T = W.transpose()
-I = np.dot(W_T, W)
+W_T = new_W.transpose()
+I = np.dot(W_T, new_W)
 O = np.linalg.inv(I)
 M = np.dot(O, W_T)
 G = np.dot(M, Y)
