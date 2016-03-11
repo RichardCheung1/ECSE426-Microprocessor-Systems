@@ -46,20 +46,20 @@ void update_segment_display(float f)
 			case 0:
 				display_number( number % 10, 0);
 				HAL_GPIO_WritePin( GPIOE, GPIO_PIN_3, GPIO_PIN_SET) ;
-				delay(500);
+				delay(1500);
 			break; 
 			// first digit will shut off and 2nd digit will light, other digits are still shut off
 			case 1:
 				display_number( number % 10, decimal_position_ten);
 				HAL_GPIO_WritePin( GPIOE, GPIO_PIN_2 , GPIO_PIN_SET) ;			
-				delay(500);
+				delay(1500);
 				break;
 			
 			// third digit will light and others are shut off
 			case 2: 
 				display_number( number % 10, decimal_position_one);				
 				HAL_GPIO_WritePin( GPIOE, GPIO_PIN_1, GPIO_PIN_SET) ;
-				delay(500);
+				delay(1500);
 
 			break; 
 		}
@@ -83,7 +83,6 @@ int get_decimal_position(float f)
 {
 	int i;
 	char c[10];
-	sprintf(c, "%f", f);
 	for (  i = 0 ; i < 4; i++) {
 		if (c[i] == '.') {
 			 return i; 

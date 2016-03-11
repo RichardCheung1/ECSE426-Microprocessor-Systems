@@ -195,10 +195,10 @@ void print_filtered_acceleration(void)
 	//printf("The accelerometer values are\t");
 	for(i = 0; i < 3; i++)
 	{
-		printf("%f,", acceleration_filtered[i]);
+		//printf("%f,", acceleration_filtered[i]);
 	}
 	
-	printf("\n");
+	//printf("\n");
 }
 
 /**

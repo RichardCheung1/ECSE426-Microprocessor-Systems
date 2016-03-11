@@ -31,7 +31,7 @@ void TIM_Init()
 	
 	HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_0);
 	HAL_NVIC_EnableIRQ(TIM3_IRQn);
-	HAL_NVIC_SetPriority(TIM3_IRQn, 0, 1);
+	HAL_NVIC_SetPriority(TIM3_IRQn, 0, 2);
 }
 
 

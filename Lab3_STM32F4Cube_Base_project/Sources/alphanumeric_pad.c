@@ -90,7 +90,6 @@ char get_key()
 	row = get_row();
 	
 	debouncer();
-	//printf("%c %d%d\n", key, row, column);
 	return key;
 }
 /**

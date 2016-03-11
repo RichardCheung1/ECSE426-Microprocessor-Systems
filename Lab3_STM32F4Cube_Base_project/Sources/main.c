@@ -66,12 +66,11 @@ int main(void)
 				input_value = 0;
 				printf("%s", "Inputted value too high must be less than 180!\n");
 			}
-			printf ("threshold : %f\n", threshold); 
 			threshold = input_value;
 			input_value = 0;
 			input_flag =0 ;
 		}
-
+		printf ("threshold : %f\n", threshold); 
 		//If the EXTI0 callback function is called and flag is set to active, read accelerometer values
 		if(EXTI0_flag_value == INTERRUPT_ACTIVE_FLAG) {
 			
@@ -143,13 +142,8 @@ void SystemClock_Config(void){
    * @retval None
    */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-	if (counter == 4)
-	{		
+{	
 		EXTI0_flag_value = 1;
-		counter = 0 ;
-	}
-	counter++;
 }
 
 /**
