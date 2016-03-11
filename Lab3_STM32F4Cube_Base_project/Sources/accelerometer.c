@@ -228,41 +228,55 @@ void calculate_angles(void)
 }
 
 /**
-   * @brief A function used to compare user input angle with the actual angle
+   * @brief A function used to compare user input angle with the actual angle, and blink LEDs accordingly
 	 * @param none
 	 * @retval 
    */
 void compare_user_actual_angle(void)
 {
+	float neg_roll = roll*(-1);
+	float neg_threshold = threshold*(-1);
 	//check if the threshold has been set
 	if(threshold_set_flag) {
 		
 		//if less than the threshold, blink LD3(orange) to tell user to lower the board in that direction
-		if(fabsf(roll) < (threshold-THRESHOLD_TOLERANCE)) {
-			//if(count_for_animation>=10 && count_for_animation<20) HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
+		if((roll > 0 && roll < (threshold-THRESHOLD_TOLERANCE)) || (roll < 0 && roll < (neg_threshold-THRESHOLD_TOLERANCE))) {
+			
+			if(count_for_animation>=700 && count_for_animation<1000) {
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
+			} else {
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
+			}
+			
 			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12 | GPIO_PIN_14 | GPIO_PIN_15, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
 			
 			
 		//if less than the threshold, blink LD6(blue) to tell user to lower the board in that direction
-		} else if(fabsf(roll) > (threshold+THRESHOLD_TOLERANCE)) {
-			//if(count_for_animation>=10 && count_for_animation<20) HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_RESET);
+		} else if((roll > 0 && roll > (threshold+THRESHOLD_TOLERANCE)) || (roll < 0 && roll > (neg_threshold+THRESHOLD_TOLERANCE))) {
+			if(count_for_animation>=700 && count_for_animation<1000) {
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_RESET);
+			} else {
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_SET);
+			}
 			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_12, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_SET);
 			
 			
-		//if within range, show all LEDs to tell user that the board pitch/roll angle is within defined range
+			
+		//if within range, blink all LEDs to tell user that the board pitch/roll angle is within defined range
 		} else {
-			//if(count_for_animation>=10 && count_for_animation<20) HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
-			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
-			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
-			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_SET);
+			if(count_for_animation>=700 && count_for_animation<1000) {
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15, GPIO_PIN_RESET);
+			} else {
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_SET);
+			}
 		}
-		//count_for_animation++;
+		count_for_animation++;
 		
 		//reset the counter to 0
-		//if(count_for_animation==20) count_for_animation = 0;
+		if(count_for_animation==1000) count_for_animation = 0;
 	}
 }
 
