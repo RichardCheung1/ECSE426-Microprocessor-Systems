@@ -26,4 +26,7 @@ void display_number(int number, int decimal);
 int get_decimal_position(float f) ;
 void delay(int i);
 
+extern int segment_display_flag;
+extern	int position ;
+
 #endif /* __SEGMENT_DISPLAY_H */

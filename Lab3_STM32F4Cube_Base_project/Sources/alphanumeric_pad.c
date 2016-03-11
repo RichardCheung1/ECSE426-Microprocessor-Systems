@@ -33,14 +33,15 @@ char keys[4][4] =
 };
 /**
    * @brief function concat int with the form of XY
-   */
+	 * @param takes parameter x and y to concat both number
+*/
 int int_concat(int x, int y){
 	return 10*x + y;
 }
 
 /**
    * @brief function to set the input value with the keys pressed
-	 * @param 
+	 * @param takes parameter key from get_key in order to do map the right char
    */
 void set_input(char key)
 {

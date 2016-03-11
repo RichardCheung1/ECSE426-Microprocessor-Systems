@@ -90,7 +90,8 @@ int main(void)
 			//printf("Pitch angle %f\n", pitch);
 			//printf("Roll angle %f\n", roll);
 			update_segment_display(fabs(roll));
-			
+				//update_segment_display(1.23f);
+
 			//compare the user defined and actual angles
 			compare_user_actual_angle();
 			
@@ -158,6 +159,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	TIM3_counter ++;
 	TIM3_flag_value = 1;
+	segment_display_flag = 1;
 }
 
 #ifdef USE_FULL_ASSERT

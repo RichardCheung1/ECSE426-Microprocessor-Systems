@@ -11,6 +11,13 @@
 	
 #include "segment_display.h"
 
+int segment_display_flag;
+int position;
+int number;
+int update_flag ;
+int decimal_position_one, decimal_position_ten;
+
+
 /**
    * @brief A function used to update the seven segment display with the temp value
 	 * @param float f: float containing the temperature value in celcius
@@ -18,26 +25,25 @@
 //updates the segment display in the format of XY.Z by using the multiplexing
 void update_segment_display(float f)
 {	
-	int decimal_position_one, decimal_position_ten, number;
-	int position = 0;
-
-	if (f < 10){
-		decimal_position_ten =0;
-		decimal_position_one =1;
-		number = f*100;
+	clear_select_pin(); 
+	clear_segment_pin();
+	if (!update_flag) {
+		if (f < 10){
+			decimal_position_ten =0;
+			decimal_position_one =1;
+			number = f*100;
+		}
+		else if (f < 100) {
+			decimal_position_ten =1;
+			decimal_position_one =0;
+			number = f*10;
+		}
+		else{
+			decimal_position_ten =0;
+			decimal_position_one =0;
+			number= f;
+		}
 	}
-	else if (f < 100) {
-		decimal_position_ten =1;
-		decimal_position_one =0;
-		number = f*10;
-	}
-	else{
-		decimal_position_ten =0;
-		decimal_position_one =0;
-		number= f;
-	}
-	
-	while( position != 3){
 		// turn off all selected pins
 		clear_select_pin();
 		switch (position) 
@@ -46,52 +52,65 @@ void update_segment_display(float f)
 			case 0:
 				display_number( number % 10, 0);
 				HAL_GPIO_WritePin( GPIOE, GPIO_PIN_3, GPIO_PIN_SET) ;
-				delay(2250);
-			break; 
+				position ++; 
+						update_flag = 1;
+
+				break; 
 			// first digit will shut off and 2nd digit will light, other digits are still shut off
 			case 1:
 				display_number( number % 10, decimal_position_ten);
-				HAL_GPIO_WritePin( GPIOE, GPIO_PIN_2 , GPIO_PIN_SET) ;			
-				delay(2250);
+				HAL_GPIO_WritePin( GPIOE, GPIO_PIN_2 , GPIO_PIN_SET) ;	
+				position ++; 
+						update_flag = 1;
+
 				break;
 			
 			// third digit will light and others are shut off
 			case 2: 
 				display_number( number % 10, decimal_position_one);				
 				HAL_GPIO_WritePin( GPIOE, GPIO_PIN_1, GPIO_PIN_SET) ;
-				delay(2250);
-
-			break; 
+				position ++; 
+				update_flag = 1;
+				break;
+			
+			case 3:
+				position ++;
+				update_flag = 1;
+				break;
 		}
-		clear_select_pin(); 
-		clear_segment_pin();
-		HAL_GPIO_WritePin( GPIOE, GPIO_PIN_4, GPIO_PIN_SET) ;
-		HAL_GPIO_WritePin( GPIOC, GPIO_PIN_3, GPIO_PIN_SET) ;
-		delay(2250);
-		position ++; 
 		number /= 10;
-		clear_segment_pin();
+		if (position == 4) {
+			clear_select_pin(); 
+			clear_segment_pin();
+			HAL_GPIO_WritePin( GPIOE, GPIO_PIN_4, GPIO_PIN_SET) ;
+			HAL_GPIO_WritePin( GPIOC, GPIO_PIN_3, GPIO_PIN_SET) ;
+			position = 0;
+			update_flag = 0;
+		}
 	}
-}
 
-void delay(int i){
-	int j;
-	for (j = 0; j<i ; j++) {}
-}
+//void delay(int i){
+//	int j;
+//	for (j = 0; j<i ; j++) {}
+//}
 
-int get_decimal_position(float f) 
-{
-	int i;
-	char c[10];
-	sprintf(c, "%f", f);
-	for (  i = 0 ; i < 4; i++) {
-		if (c[i] == '.') {
-			 return i; 
-		} 
-	}
-	return 0; 
-}	
+//int get_decimal_position(float f) 
+//{
+//	int i;
+//	char c[10];
+//	sprintf(c, "%f", f);
+//	for (  i = 0 ; i < 4; i++) {
+//		if (c[i] == '.') {
+//			 return i; 
+//		} 
+//	}
+//	return 0; 
+//}	
 
+/**
+   * @brief A function used to init the segment display
+	 * @retval none
+   */
 void segment_display_init () 
 {
 		//Configure GPIOC for the 4 select lines
