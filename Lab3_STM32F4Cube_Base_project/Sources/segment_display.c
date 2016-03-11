@@ -187,5 +187,3 @@ void clear_select_pin (void)
 {
 	HAL_GPIO_WritePin (GPIOE , GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3| GPIO_PIN_4, GPIO_PIN_RESET); 			
 }
-
-

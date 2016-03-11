@@ -85,7 +85,7 @@ void set_input(char key)
 
 /**
    * @brief function to get the key pressed
-	 * @param 
+	 * @retval key: returns the key associated with the keypad mapping position
    */
 char get_key() 
 {

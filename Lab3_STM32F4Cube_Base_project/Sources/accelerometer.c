@@ -183,6 +183,7 @@ void get_calibrated_acceleration(void)
 	//Print the filtered values
 	//print_filtered_acceleration();
 	
+	//Calculate the roll and pitch angles
 	calculate_angles();
 }
 

@@ -12,7 +12,9 @@
 #include "timer.h"
 TIM_HandleTypeDef TIM3_Handle;
 
-
+/*
+   * @brief A function used to configure and init the timer
+   */
 void TIM_Init() 
 {
 	//1kHz
