@@ -10,7 +10,7 @@
       <TargetName>Lab 3</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pArmCC>5050169::V5.05 update 2 (build 169)::.\ARMCC_505u2</pArmCC>
+      <pCCUsed>5060061::V5.06 update 1 (build 61)::ARMCC</pCCUsed>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F407VGTx</Device>
@@ -230,6 +230,7 @@
             <useUlib>1</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
+            <nSecure>0</nSecure>
             <RoSelD>3</RoSelD>
             <RwSelD>3</RwSelD>
             <CodeSel>0</CodeSel>
@@ -366,6 +367,8 @@
             <useXO>0</useXO>
             <v6Lang>0</v6Lang>
             <v6LangP>0</v6LangP>
+            <vShortEn>0</vShortEn>
+            <vShortWch>0</vShortWch>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER, STM32F407xx ,  __FPU_PRESENT=1 , HSE_VALUE=8000000</Define>
@@ -448,6 +451,8 @@
                 <useXO>2</useXO>
                 <v6Lang>0</v6Lang>
                 <v6LangP>0</v6LangP>
+                <vShortEn>0</vShortEn>
+                <vShortWch>0</vShortWch>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -505,6 +510,16 @@
               <FileType>1</FileType>
               <FilePath>.\Sources\alphanumeric_pad.c</FilePath>
             </File>
+            <File>
+              <FileName>timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\timer.c</FilePath>
+            </File>
+            <File>
+              <FileName>accelerometer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\accelerometer.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -545,6 +560,8 @@
                 <useXO>2</useXO>
                 <v6Lang>0</v6Lang>
                 <v6LangP>0</v6LangP>
+                <vShortEn>0</vShortEn>
+                <vShortWch>0</vShortWch>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -583,6 +600,11 @@
           <GroupName>Headers</GroupName>
           <Files>
             <File>
+              <FileName>accelerometer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\accelerometer.h</FilePath>
+            </File>
+            <File>
               <FileName>main.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Headers\main.h</FilePath>
@@ -601,6 +623,16 @@
               <FileName>supporting_functions.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Headers\supporting_functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>alphanumeric_pad.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\alphanumeric_pad.h</FilePath>
+            </File>
+            <File>
+              <FileName>timer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\timer.h</FilePath>
             </File>
           </Files>
         </Group>

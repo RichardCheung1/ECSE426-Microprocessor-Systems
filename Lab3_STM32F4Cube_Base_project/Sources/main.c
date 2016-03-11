@@ -18,6 +18,8 @@ GPIO_InitTypeDef GPIO_InitStruct;
 int EXTI0_flag_value;
 int TIM3_flag_value;
 int counter;
+int TIM3_counter;
+float threshold; 
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config	(void);
@@ -33,32 +35,19 @@ int main(void)
   SystemClock_Config();
 	
   /* Initialize all configured peripherals */
-	//__HAL_RCC_GPIOA_CLK_ENABLE();
-	//__HAL_RCC_GPIOC_CLK_ENABLE();
+	__HAL_RCC_GPIOC_CLK_ENABLE();
 	__HAL_RCC_GPIOD_CLK_ENABLE();
 	__HAL_RCC_GPIOE_CLK_ENABLE();
 	
 	//Initialize the Accelerometer and the external interrup line 0
 	configure_init_accelerometer();
 	configure_interrupt_line();
-	 
-//	//Configure GPIOC for the 4 select lines
-//	GPIO_InitStruct.Pin = GPIO_PIN_4 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3;
-//	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-//	GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
-//	GPIO_InitStruct.Pull = GPIO_NOPULL; 
-//	HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
-//	
-//	//Configure GPIOA for the segments
-//	GPIO_InitStruct.Pin = GPIO_PIN_8 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7;
-//	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-//	GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
-//	GPIO_InitStruct.Pull = GPIO_NOPULL; 
-//	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 	
+	//Initialize the 4 digit 7segment Display
+	segment_display_init();
 	
 	//configure tim3
-	//TIM_Init(); 
+	TIM_Init(); 
 	
 	//Initialize the kalman filter structs
 	Kalmanfilter_init();
@@ -66,11 +55,22 @@ int main(void)
 	while (1){
 	
 		//i =0;
+		get_key();
+		
+		if (input_flag) 
+		{
+			if ( input_value >180) 
+			{
+				threshold = 0;
+				input_value = 0;
+				printf("%s", "Inputted value too high must be less than 180!\n");
+			}
+			threshold = input_value;
+			input_value = 0;
+			input_flag =0 ;
+		}
+		printf ("threshold : %f\n", threshold); 
 
-		//get_key();
-		
-		//update_segment_display(2.02f);
-		
 		//If the EXTI0 callback function is called and flag is set to active, read accelerometer values
 		if(EXTI0_flag_value == INTERRUPT_ACTIVE_FLAG) {
 			
@@ -83,8 +83,10 @@ int main(void)
 		
 		//If the TIM3 callback function is called and flag is set to active, update the 7segment display
 		if(TIM3_flag_value == INTERRUPT_ACTIVE_FLAG) {
-				//TODO
-		
+
+			//printf("Pitch angle %f\n", pitch);
+			//printf("Roll angle %f\n", roll);
+			update_segment_display(fabs(roll));
 			//Reset the flag
 			TIM3_flag_value = 0;
 		}
@@ -150,8 +152,9 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
    * @param *htim
    * @retval None
    */
-void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
+	TIM3_counter ++;
 	TIM3_flag_value = 1;
 }
 

@@ -24,6 +24,9 @@ float acceleration_reading[3];
 float acceleration_filtered[3];
 float acceleration_normalized[3];
 int i;
+float pitch;
+float roll;
+
 float calibration_param_matrix[4][3] = {
 	{0.975054748, -0.0182180993, -0.000305652774},
 	{-0.0307680088, 1.00024108, -0.00438213129},
@@ -206,29 +209,18 @@ void print_filtered_acceleration(void)
    */
 void calculate_angles(void)
 {
-	pitch = atan2(acceleration_normalized[0], sqrt(acceleration_normalized[1]*acceleration_normalized[1] + acceleration_normalized[2]*acceleration_normalized[2])) * 180/ 3.14159265;
-	roll = atan2(acceleration_normalized[1], sqrt(acceleration_normalized[0]*acceleration_normalized[0] + acceleration_normalized[2]*acceleration_normalized[2])) * 180/ 3.14159265;
+	//pitch = atan2(acceleration_normalized[0], sqrt(acceleration_normalized[1]*acceleration_normalized[1] + acceleration_normalized[2]*acceleration_normalized[2])) * 180/ 3.14159265;
+	//roll = atan2(acceleration_normalized[1], sqrt(acceleration_normalized[0]*acceleration_normalized[0] + acceleration_normalized[2]*acceleration_normalized[2])) * 180/ 3.14159265;
 	
 	//Normalize the angles to show within a 0 to 180 degree range
 	
-	//float roll = atan2(acceleration_normalized[0],acceleration_normalized[2]) * 180/ 3.14159265;
-	//float pitch = atan2(acceleration_normalized[1],acceleration_normalized[2]) * 180/ 3.14159265;
-
+	roll = atan2(acceleration_normalized[0],acceleration_normalized[2]) * 180/ 3.14159265;
+	pitch = atan2(acceleration_normalized[1],acceleration_normalized[2]) * 180/ 3.14159265;
+	
+	//reinitialize the normalized array
 	acceleration_normalized[0] =0 ;
 	acceleration_normalized[1] =0 ;
 	acceleration_normalized[2] =0 ;
 
-	printf("Pitch angle %f\n", pitch);
-	printf("Roll angle %f\n", roll);
 }
 
-void normalize_angles(void)
-{	
-	if(roll < 0) {
-	
-	}
-	
-	if(pitch < 0) {
-		
-	}
-}

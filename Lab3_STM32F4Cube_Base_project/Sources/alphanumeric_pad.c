@@ -11,6 +11,7 @@
 	
 #include "alphanumeric_pad.h"
 
+
 int column;
 int row;
 int keypad_state;
@@ -21,8 +22,6 @@ const int IDLE = 0;
 const int DEBOUNCING = 1;
 const int PRESSED = 2;
 const int RELEASED = 3;
-const int delay_offset = 20;
-int debouncing_delay = 0;
 char keys[4][4] = 
 {  
  {'1', '2', '3', 'A'},
@@ -30,14 +29,55 @@ char keys[4][4] =
  {'7', '8', '9', 'C'},
  {'*', '0', '#', 'D'},
 };
+/**
+   * @brief function concat int with the form of XY
+   */
+int int_concat(int x, int y){
+	return 10*x + y;
+}
 
 /**
-   * @brief function to get the key pressed
+   * @brief function to set the input value with the keys pressed
 	 * @param 
    */
-void set_input() 
+void set_input(char key)
 {
-	
+	switch (key) 
+	{
+		case '0':
+			input_value = int_concat(input_value,0);
+			break;
+		case '1':
+			input_value = int_concat(input_value,1);
+			break;
+		case '2':
+			input_value = int_concat(input_value,2);
+			break;
+		case '3':
+			input_value = int_concat(input_value,3);
+			break;
+		case '4':
+			input_value = int_concat(input_value,4);
+			break;
+		case '5':
+			input_value = int_concat(input_value,5);
+			break;
+		case '6':
+			input_value = int_concat(input_value,6);
+			break;
+		case '7':
+			input_value = int_concat(input_value,7);
+			break;
+		case '8':
+			input_value = int_concat(input_value,8);
+			break;
+		case '9':
+			input_value = int_concat(input_value,9);
+			break;
+		default:
+			input_flag = 1;
+			break;
+	}
 }
 
 /**
@@ -59,28 +99,29 @@ char get_key()
    */
 void debouncer()
 {
-	//printf("%d\n", keypad_state);
 	switch(keypad_state){
 		case IDLE:
+			TIM3_counter = 0;
 			if(column != -1 && row != -1){
-				debouncing_delay = __HAL_TIM_GetCounter(&TIM3_Handle);
 				keypad_state = DEBOUNCING;
 			}
 			break;
 		case DEBOUNCING:
-			if((debouncing_delay + delay_offset) % 150 == __HAL_TIM_GetCounter(&TIM3_Handle)){
+			TIM3_counter = 0;
+			if(TIM3_counter % 1000 == 0){
 				key = keys[row][column];
+				set_input(key);
 				keypad_state = PRESSED;
 			}
 			break;
 		case PRESSED:
 			if(column == -1 || row == -1){
-				debouncing_delay = __HAL_TIM_GetCounter(&TIM3_Handle);
 				keypad_state = RELEASED;
 			}
 			break;
 		case RELEASED:
-			if((debouncing_delay + delay_offset) % 150 == __HAL_TIM_GetCounter(&TIM3_Handle)){
+			TIM3_counter = 0;
+			if(TIM3_counter % 1000 == 0){
 				keypad_state = IDLE;
 				key = ' ';
 			}
@@ -88,6 +129,8 @@ void debouncer()
 	
 	}
 }
+
+
 /**
    * @brief function to determine the column that the key is pressed, where PIN0,PIN1,PIN2,PIN3
 						are respectively column 1,2,3,4
@@ -113,7 +156,7 @@ int get_col()
 //		printf ("%d ", HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_1));
 //		printf ("%d ", HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_5));
 //		printf ("%d \n ", HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_6));
-	
+//	
 	
 	if ( HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_3) == GPIO_PIN_RESET ) {
 		return 0;

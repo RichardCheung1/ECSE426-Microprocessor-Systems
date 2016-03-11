@@ -48,10 +48,13 @@
 #include "timer.h"
 #include "alphanumeric_pad.h"
 #include "accelerometer.h"
+#include "math.h"
+
 
 /* Exported types ------------------------------------------------------------*/
 extern GPIO_InitTypeDef GPIO_InitStruct;
 
+extern int TIM3_counter;
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */

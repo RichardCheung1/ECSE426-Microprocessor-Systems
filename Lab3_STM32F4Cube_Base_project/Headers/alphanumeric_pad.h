@@ -16,6 +16,8 @@
 #include "timer.h"
 
 
+/* Exported Variables ------------------------------------------------------- */
+extern int input_value, input_flag; 
 /* Exported functions ------------------------------------------------------- */
 
 
@@ -24,5 +26,7 @@ int get_col(void);
 int get_row(void);
 char get_key(void) ;
 void debouncer(void);
+void set_input(char key);
+
 
 #endif /* __ALPHANUMERIC_PAD_H */

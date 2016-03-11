@@ -161,21 +161,6 @@ void SysTick_Handler(void)
 
 void TIM3_IRQHandler(void)
 {
-	//42MHz
-	//calls the TIM handler function in segment_display.c
-	
-	//In case other interrupts are also running
-	/*if (__HAL_TIM_GET_FLAG(&TIM3_Handle, TIM_FLAG_UPDATE) != RESET)      
-    {
-        if (__HAL_TIM_GET_ITSTATUS(&TIM3_Handle, TIM_IT_UPDATE) != RESET)
-        {
-            __HAL_TIM_CLEAR_FLAG(&TIM3_Handle, TIM_FLAG_UPDATE);
-					
-						printf("dsa\n"); 
-
-        }
-    }*/
-	// what is this?
 	HAL_TIM_IRQHandler(&TIM3_Handle);
 }
 
