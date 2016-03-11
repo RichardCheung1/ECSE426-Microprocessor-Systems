@@ -26,19 +26,19 @@ float acceleration_normalized[3];
 int i;
 float pitch;
 float roll;
-
+/*
 float calibration_param_matrix[4][3] = {
 	{0.975054748, -0.0182180993, -0.000305652774},
 	{-0.0307680088, 1.00024108, -0.00438213129},
 	{-0.00617881222, -0.00113744427, 0.963388786},
 	{0.00214820029, 0.00162097280, -0.0131357405}
-};/*
-float calibration_param_matrix[4][3] = {
-	{0.9932,-0.0189,0.0662},
-	{0.0170, 0.9770,0.0493},
-	{-0.0026,-0.01717,0.9498},
-	{0.0023, -0.0051,-0.0495}
 };*/
+float calibration_param_matrix[4][3] = {
+	{0.000975054748, -0.0000182180993, -0.0000000305652774},
+	{-0.0000307680088, 0.00100024108, -0.00000438213129},
+	{-0.00000617881222, -0.00000113744427, 0.000963388786},
+	{0.00214820029, 0.00162097280, -0.0131357405}
+};
 
 /* Private function prototypes -----------------------------------------------*/
 void print_filtered_acceleration(void);
@@ -101,24 +101,24 @@ void configure_interrupt_line(void)
 void Kalmanfilter_init(void) {
 	
 	//Kalman state struct to filter Ax values
-	x_kstate.q = 50.0f; //process noise covariance
-	x_kstate.r = 0.01f; //measurement noise covariance
+	x_kstate.q = 0.10f; //process noise covariance
+	x_kstate.r = 2.00f; //measurement noise covariance
 	x_kstate.x = 0.0f; //estimated value
-	x_kstate.p = 1500.0f; //estimation error covariance
+	x_kstate.p = 2.0f; //estimation error covariance
 	x_kstate.k = 0.0f; //kalman gain
 	
 	//Kalman state struct to filter Ay values
-	y_kstate.q = 50.0f; //process noise covariance
-	y_kstate.r = 0.01f; //measurement noise covariance
+	y_kstate.q = 0.10f; //process noise covariance
+	y_kstate.r = 2.00f; //measurement noise covariance
 	y_kstate.x = 0.0f; //estimated value
-	y_kstate.p = 1500.0f; //estimation error covariance
+	y_kstate.p = 2.0f; //estimation error covariance
 	y_kstate.k = 0.0f; //kalman gain
 	
 	//Kalman state struct to filter Az values
-	z_kstate.q = 50.0f; //process noise covariance
-	z_kstate.r = 0.05f; //measurement noise covariance
+	z_kstate.q = 0.10f; //process noise covariance
+	z_kstate.r = 2.00f; //measurement noise covariance
 	z_kstate.x = 1000.0f; //estimated value
-	z_kstate.p = 1500.0f; //estimation error covariance
+	z_kstate.p = 2.0f; //estimation error covariance
 	z_kstate.k = 0.0f; //kalman gain
 }
 
@@ -214,13 +214,15 @@ void calculate_angles(void)
 	
 	//Normalize the angles to show within a 0 to 180 degree range
 	
-	roll = atan2(acceleration_normalized[0],acceleration_normalized[2]) * 180/ 3.14159265;
-	pitch = atan2(acceleration_normalized[1],acceleration_normalized[2]) * 180/ 3.14159265;
+	pitch = atan2(acceleration_normalized[0],acceleration_normalized[2]) * 180/ 3.14159265;
+	roll = atan2(acceleration_normalized[1],acceleration_normalized[2]) * 180/ 3.14159265;
 	
 	//reinitialize the normalized array
 	acceleration_normalized[0] =0 ;
 	acceleration_normalized[1] =0 ;
 	acceleration_normalized[2] =0 ;
-
 }
 
+void compare_user_actual_angle(void)
+{
+}
