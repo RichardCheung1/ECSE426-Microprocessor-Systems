@@ -17,7 +17,7 @@
 
 
 /* Exported Variables ------------------------------------------------------- */
-extern int input_value, input_flag; 
+extern int input_value, input_flag, threshold_set_flag; 
 /* Exported functions ------------------------------------------------------- */
 
 

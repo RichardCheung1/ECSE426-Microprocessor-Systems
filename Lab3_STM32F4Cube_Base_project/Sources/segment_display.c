@@ -46,20 +46,20 @@ void update_segment_display(float f)
 			case 0:
 				display_number( number % 10, 0);
 				HAL_GPIO_WritePin( GPIOE, GPIO_PIN_3, GPIO_PIN_SET) ;
-				delay(250);
+				delay(2250);
 			break; 
 			// first digit will shut off and 2nd digit will light, other digits are still shut off
 			case 1:
 				display_number( number % 10, decimal_position_ten);
 				HAL_GPIO_WritePin( GPIOE, GPIO_PIN_2 , GPIO_PIN_SET) ;			
-				delay(250);
+				delay(2250);
 				break;
 			
 			// third digit will light and others are shut off
 			case 2: 
 				display_number( number % 10, decimal_position_one);				
 				HAL_GPIO_WritePin( GPIOE, GPIO_PIN_1, GPIO_PIN_SET) ;
-				delay(250);
+				delay(2250);
 
 			break; 
 		}
@@ -67,7 +67,7 @@ void update_segment_display(float f)
 		clear_segment_pin();
 		HAL_GPIO_WritePin( GPIOE, GPIO_PIN_4, GPIO_PIN_SET) ;
 		HAL_GPIO_WritePin( GPIOC, GPIO_PIN_3, GPIO_PIN_SET) ;
-		delay(250);
+		delay(2250);
 		position ++; 
 		number /= 10;
 		clear_segment_pin();

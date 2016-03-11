@@ -39,6 +39,9 @@ int main(void)
 	__HAL_RCC_GPIOD_CLK_ENABLE();
 	__HAL_RCC_GPIOE_CLK_ENABLE();
 	
+	//Config LEDs
+	config_animation_LEDs();
+	 
 	//Initialize the Accelerometer and the external interrup line 0
 	configure_init_accelerometer();
 	configure_interrupt_line();
@@ -87,6 +90,10 @@ int main(void)
 			//printf("Pitch angle %f\n", pitch);
 			//printf("Roll angle %f\n", roll);
 			update_segment_display(fabs(roll));
+			
+			//compare the user defined and actual angles
+			compare_user_actual_angle();
+			
 			//Reset the flag
 			TIM3_flag_value = 0;
 		}
@@ -139,12 +146,9 @@ void SystemClock_Config(void){
    */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	if (counter == 4)
-	{		
+	
 		EXTI0_flag_value = 1;
-		counter = 0 ;
-	}
-	counter++;
+		
 }
 
 /**

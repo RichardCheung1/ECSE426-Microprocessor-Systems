@@ -17,6 +17,8 @@ int row;
 int keypad_state;
 int input_value; 
 int input_flag; 
+int threshold_set_flag;
+
 char key = ' ';
 const int IDLE = 0;
 const int DEBOUNCING = 1;
@@ -76,6 +78,7 @@ void set_input(char key)
 			break;
 		default:
 			input_flag = 1;
+			threshold_set_flag = 1;
 			break;
 	}
 }

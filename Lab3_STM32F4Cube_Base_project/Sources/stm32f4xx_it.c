@@ -166,11 +166,7 @@ void TIM3_IRQHandler(void)
 
 void EXTI0_IRQHandler(void)
 {
-	if(__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_0) != RESET)
-  {   
-    __HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_0);
-    HAL_GPIO_EXTI_Callback(GPIO_PIN_0);
-  }
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
 }
 /******************************************************************************/
 /*                 STM32F4xx Peripherals Interrupt Handlers                   */

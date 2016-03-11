@@ -53,7 +53,7 @@
 
 /* Exported types ------------------------------------------------------------*/
 extern GPIO_InitTypeDef GPIO_InitStruct;
-
+extern float threshold; 
 extern int TIM3_counter;
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/

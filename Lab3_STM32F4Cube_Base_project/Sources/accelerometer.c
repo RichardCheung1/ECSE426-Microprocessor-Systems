@@ -13,6 +13,9 @@
 #include "accelerometer.h"
 #include "math.h"
 
+/* Defines ------------------------------------------------------------------*/
+#define THRESHOLD_TOLERANCE 5.0f
+
 /* Private variables ---------------------------------------------------------*/
 LIS3DSH_InitTypeDef LIS3DSH_InitStruct;
 LIS3DSH_DRYInterruptConfigTypeDef LIS3DSH_IntConfigStruct;
@@ -26,6 +29,7 @@ float acceleration_normalized[3];
 int i;
 float pitch;
 float roll;
+int count_for_animation;
 /*
 float calibration_param_matrix[4][3] = {
 	{0.975054748, -0.0182180993, -0.000305652774},
@@ -56,7 +60,7 @@ void configure_init_accelerometer(void)
 	LIS3DSH_InitStruct.Power_Mode_Output_DataRate = LIS3DSH_DATARATE_25;        /* Ppower down or /active mode with output data rate 3.125 / 6.25 / 12.5 / 25 / 50 / 100 / 400 / 800 / 1600 HZ */
   LIS3DSH_InitStruct.Axes_Enable = LIS3DSH_XYZ_ENABLE;                        /* Axes enable */
   LIS3DSH_InitStruct.Continous_Update = LIS3DSH_ContinousUpdate_Disabled;			/* Block or update Low/High registers of data until all data is read */
-	LIS3DSH_InitStruct.AA_Filter_BW = LIS3DSH_AA_BW_800;													/* Choose anti-aliasing filter BW 800 / 400 / 200 / 50 Hz*/
+	LIS3DSH_InitStruct.AA_Filter_BW = LIS3DSH_AA_BW_50;													/* Choose anti-aliasing filter BW 800 / 400 / 200 / 50 Hz*/
   LIS3DSH_InitStruct.Full_Scale = LIS3DSH_FULLSCALE_2;                        /* Full scale 2 / 4 / 6 / 8 / 16 g */
   LIS3DSH_InitStruct.Self_Test = LIS3DSH_SELFTEST_NORMAL;                     /* Self test */
 	
@@ -204,8 +208,7 @@ void print_filtered_acceleration(void)
 /**
    * @brief A function used to print filtered accelerometer readings
 	 * @param none
-   * @param none
-	 * @retval 
+	 * @retval none
    */
 void calculate_angles(void)
 {
@@ -223,6 +226,58 @@ void calculate_angles(void)
 	acceleration_normalized[2] =0 ;
 }
 
+/**
+   * @brief A function used to compare user input angle with the actual angle
+	 * @param none
+	 * @retval 
+   */
 void compare_user_actual_angle(void)
 {
+	//check if the threshold has been set
+	if(threshold_set_flag) {
+		
+		//if less than the threshold, blink LD3(orange) to tell user to lower the board in that direction
+		if(fabsf(roll) < (threshold-THRESHOLD_TOLERANCE)) {
+			//if(count_for_animation>=10 && count_for_animation<20) HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12 | GPIO_PIN_14 | GPIO_PIN_15, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
+			
+			
+		//if less than the threshold, blink LD6(blue) to tell user to lower the board in that direction
+		} else if(fabsf(roll) > (threshold+THRESHOLD_TOLERANCE)) {
+			//if(count_for_animation>=10 && count_for_animation<20) HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_12, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_SET);
+			
+			
+		//if within range, show all LEDs to tell user that the board pitch/roll angle is within defined range
+		} else {
+			//if(count_for_animation>=10 && count_for_animation<20) HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_SET);
+		}
+		//count_for_animation++;
+		
+		//reset the counter to 0
+		//if(count_for_animation==20) count_for_animation = 0;
+	}
+}
+
+/**
+   * @brief A function used to configure the onboard LEDs
+	 * @param none
+	 * @retval 
+   */
+void config_animation_LEDs(void)
+{	
+	//Configure the GPIO struct for the 4 LEDs on the discovery board
+	GPIO_InitStruct.Pin = GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15; 
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP; 
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FAST; 
+
+	//Initialize GPIO for the LEDs
+	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 }
