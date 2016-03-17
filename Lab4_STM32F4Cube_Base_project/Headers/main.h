@@ -49,15 +49,24 @@
 #include "alphanumeric_pad.h"
 #include "accelerometer.h"
 #include "math.h"
+#include "temperature_sensor.h"
 
+/* Structs -------------------------------------------------------------------*/
+typedef struct stateInfo{
+	float q, r, x, p, k;
+}kalman_state;
 
 /* Exported types ------------------------------------------------------------*/
 extern GPIO_InitTypeDef GPIO_InitStruct;
-extern float threshold; 
 extern int TIM3_counter;
+extern kalman_state x_kstate, y_kstate, z_kstate, temp_kstate;
+
 /* Exported constants --------------------------------------------------------*/
+
 /* Exported macro ------------------------------------------------------------*/
+
 /* Exported functions ------------------------------------------------------- */
+extern int Kalmanfilter_C(float measured_acceleration, kalman_state* kstate);
 
 #endif /* __MAIN_H */
 

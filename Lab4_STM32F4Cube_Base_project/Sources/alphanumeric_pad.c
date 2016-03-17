@@ -4,8 +4,8 @@
   * Description        : This class provides functionality for configuring and 
 												 controlling the alphanumeric keypad
 	* Author						 : Richard Cheung, Taha Saifuddin
-	* Version            : 1.0.0
-	* Date							 : March 10th, 2016
+	* Version            : 2.0.0
+	* Date							 : March 15th, 2016
   ******************************************************************************
   */
 	
@@ -15,9 +15,12 @@
 int column;
 int row;
 int keypad_state;
-int input_value; 
-int input_flag; 
-int threshold_set_flag;
+
+//set to zero(A) for temp mode, one(B) for tilt angle mode, and minus one if no mode is selected
+int display_mode;
+
+//zero represents pitch angle, and one represents tilt angle
+int tilt_selection;
 
 char key = ' ';
 const int IDLE = 0;
@@ -31,13 +34,6 @@ char keys[4][4] =
  {'7', '8', '9', 'C'},
  {'*', '0', '#', 'D'},
 };
-/**
-   * @brief function concat int with the form of XY
-	 * @param takes parameter x and y to concat both number
-*/
-int int_concat(int x, int y){
-	return 10*x + y;
-}
 
 /**
    * @brief function to set the input value with the keys pressed
@@ -47,39 +43,25 @@ void set_input(char key)
 {
 	switch (key) 
 	{
-		case '0':
-			input_value = int_concat(input_value,0);
-			break;
+		//Case for showing the Pitch angle
 		case '1':
-			input_value = int_concat(input_value,1);
+			if(display_mode == 1) tilt_selection = 0;
 			break;
+		//Case for showing the Roll angle
 		case '2':
-			input_value = int_concat(input_value,2);
+			if(display_mode == 1) tilt_selection = 1;
 			break;
-		case '3':
-			input_value = int_concat(input_value,3);
+		//Case for Temperature display mode selection
+		case 'A':
+			display_mode = 0;
 			break;
-		case '4':
-			input_value = int_concat(input_value,4);
+		//Case for Tilt Angle mode selection
+		case 'B':
+			display_mode = 1;
 			break;
-		case '5':
-			input_value = int_concat(input_value,5);
-			break;
-		case '6':
-			input_value = int_concat(input_value,6);
-			break;
-		case '7':
-			input_value = int_concat(input_value,7);
-			break;
-		case '8':
-			input_value = int_concat(input_value,8);
-			break;
-		case '9':
-			input_value = int_concat(input_value,9);
-			break;
+		//No other dependencies from keypad
 		default:
-			input_flag = 1;
-			threshold_set_flag = 1;
+			if(display_mode == 0 || display_mode == 1) display_mode = -1;
 			break;
 	}
 }
@@ -130,7 +112,6 @@ void debouncer()
 				key = ' ';
 			}
 			break;
-	
 	}
 }
 

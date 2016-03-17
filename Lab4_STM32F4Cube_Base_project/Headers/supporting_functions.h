@@ -23,6 +23,7 @@
 #define ADC_CH_CONFIG_FAIL		((uint16_t) 3)
 #define ADC_MULTIMODE_FAIL		((uint16_t) 4)
 #define EXTI_SPI1_FAIL				((uint16_t) 5)
+#define ADC_START_FAIL 				((uint16_t) 6)
 
 void Error_Handler						(uint16_t error_code);
 

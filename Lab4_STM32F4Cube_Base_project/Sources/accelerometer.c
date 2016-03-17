@@ -13,16 +13,13 @@
 #include "accelerometer.h"
 #include "math.h"
 
-/* Defines ------------------------------------------------------------------*/
+/* Defines -------------------------------------------------------------------*/
 #define THRESHOLD_TOLERANCE 5.0f
 
-/* Private variables ---------------------------------------------------------*/
+/* Variables -----------------------------------------------------------------*/
 LIS3DSH_InitTypeDef LIS3DSH_InitStruct;
 LIS3DSH_DRYInterruptConfigTypeDef LIS3DSH_IntConfigStruct;
 GPIO_InitTypeDef GPIO_InitStructx;
-kalman_state x_kstate;
-kalman_state y_kstate;
-kalman_state z_kstate;
 float acceleration_reading[3];		
 float acceleration_filtered[3];
 float acceleration_normalized[3];
@@ -30,13 +27,7 @@ int i;
 float pitch;
 float roll;
 int count_for_animation;
-/*
-float calibration_param_matrix[4][3] = {
-	{0.975054748, -0.0182180993, -0.000305652774},
-	{-0.0307680088, 1.00024108, -0.00438213129},
-	{-0.00617881222, -0.00113744427, 0.963388786},
-	{0.00214820029, 0.00162097280, -0.0131357405}
-};*/
+
 float calibration_param_matrix[4][3] = {
 	{0.000975054748, -0.0000182180993, -0.0000000305652774},
 	{-0.0000307680088, 0.00100024108, -0.00000438213129},
@@ -95,56 +86,6 @@ void configure_interrupt_line(void)
 	GPIO_InitStructx.Speed = GPIO_SPEED_FREQ_HIGH;
 	GPIO_InitStructx.Pull = GPIO_NOPULL ; 
 	HAL_GPIO_Init(GPIOE, &GPIO_InitStructx);
-}
-
-/**
-   * @brief A function used to initialize the kalman filter struct for all axis
-	 * @param	none
-	 * @retval none
-   */
-void Kalmanfilter_init(void) {
-	
-	//Kalman state struct to filter Ax values
-	x_kstate.q = 0.10f; //process noise covariance
-	x_kstate.r = 2.00f; //measurement noise covariance
-	x_kstate.x = 0.0f; //estimated value
-	x_kstate.p = 2.0f; //estimation error covariance
-	x_kstate.k = 0.0f; //kalman gain
-	
-	//Kalman state struct to filter Ay values
-	y_kstate.q = 0.10f; //process noise covariance
-	y_kstate.r = 2.00f; //measurement noise covariance
-	y_kstate.x = 0.0f; //estimated value
-	y_kstate.p = 2.0f; //estimation error covariance
-	y_kstate.k = 0.0f; //kalman gain
-	
-	//Kalman state struct to filter Az values
-	z_kstate.q = 0.10f; //process noise covariance
-	z_kstate.r = 2.00f; //measurement noise covariance
-	z_kstate.x = 1000.0f; //estimated value
-	z_kstate.p = 2.0f; //estimation error covariance
-	z_kstate.k = 0.0f; //kalman gain
-}
-
-/**
-   * @brief A function used to filter the noisy acceleration readings
-	 * @param 
-   * @param kstate: pointer to the kalman filter configuration struct
-	 * @retval 
-   */
-int Kalmanfilter_C(float measured_acceleration, kalman_state* kstate) {	
-	kstate->p = kstate->p + kstate->q;
-	kstate->k = kstate->p / (kstate->p + kstate->r);
-	kstate->x = kstate->x + kstate->k * (measured_acceleration-kstate->x);
-
-	//The following conditional checks if kstate->x is not a number
-	if (kstate->x != kstate->x) {
-		printf("An error has occured -NaN value was found"); 
-		return 1;
-	}
-	
-	kstate->p = (1-kstate->k) * kstate->p;
-	return 0; 
 }
 
 /**
@@ -213,86 +154,18 @@ void print_filtered_acceleration(void)
    */
 void calculate_angles(void)
 {
-	//pitch = atan2(acceleration_normalized[0], sqrt(acceleration_normalized[1]*acceleration_normalized[1] + acceleration_normalized[2]*acceleration_normalized[2])) * 180/ 3.14159265;
-	//roll = atan2(acceleration_normalized[1], sqrt(acceleration_normalized[0]*acceleration_normalized[0] + acceleration_normalized[2]*acceleration_normalized[2])) * 180/ 3.14159265;
+	pitch = atan2(acceleration_normalized[0], sqrt(acceleration_normalized[1]*acceleration_normalized[1] + acceleration_normalized[2]*acceleration_normalized[2])) * 180/ 3.14159265;
+	roll = atan2(acceleration_normalized[1], sqrt(acceleration_normalized[0]*acceleration_normalized[0] + acceleration_normalized[2]*acceleration_normalized[2])) * 180/ 3.14159265;
 	
 	//Normalize the angles to show within a 0 to 180 degree range
+	pitch += 90;
+	roll += 90;
 	
-	pitch = atan2(acceleration_normalized[0],acceleration_normalized[2]) * 180/ 3.14159265;
-	roll = atan2(acceleration_normalized[1],acceleration_normalized[2]) * 180/ 3.14159265;
+	//pitch = atan2(acceleration_normalized[0],acceleration_normalized[2]) * 180/ 3.14159265;
+	//roll = atan2(acceleration_normalized[1],acceleration_normalized[2]) * 180/ 3.14159265;
 	
-	//reinitialize the normalized array
+	//Reinitialize the normalized array
 	acceleration_normalized[0] =0 ;
 	acceleration_normalized[1] =0 ;
 	acceleration_normalized[2] =0 ;
-}
-
-/**
-   * @brief A function used to compare user input angle with the actual angle, and blink LEDs accordingly
-	 * @param none
-	 * @retval 
-   */
-void compare_user_actual_angle(void)
-{
-	float neg_roll = roll*(-1);
-	float neg_threshold = threshold*(-1);
-	//check if the threshold has been set
-	if(threshold_set_flag) {
-		
-		//if less than the threshold, blink LD3(orange) to tell user to lower the board in that direction
-		if((roll > 0 && roll < (threshold-THRESHOLD_TOLERANCE)) || (roll < 0 && roll < (neg_threshold-THRESHOLD_TOLERANCE))) {
-			
-			if(count_for_animation>=700 && count_for_animation<1000) {
-				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
-			} else {
-				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
-			}
-			
-			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12 | GPIO_PIN_14 | GPIO_PIN_15, GPIO_PIN_RESET);
-			
-			
-		//if less than the threshold, blink LD6(blue) to tell user to lower the board in that direction
-		} else if((roll > 0 && roll > (threshold+THRESHOLD_TOLERANCE)) || (roll < 0 && roll > (neg_threshold+THRESHOLD_TOLERANCE))) {
-			if(count_for_animation>=700 && count_for_animation<1000) {
-				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_RESET);
-			} else {
-				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_SET);
-			}
-			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_12, GPIO_PIN_RESET);
-			
-			
-			
-		//if within range, blink all LEDs to tell user that the board pitch/roll angle is within defined range
-		} else {
-			if(count_for_animation>=700 && count_for_animation<1000) {
-				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15, GPIO_PIN_RESET);
-			} else {
-				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
-				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
-				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
-				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_SET);
-			}
-		}
-		count_for_animation++;
-		
-		//reset the counter to 0
-		if(count_for_animation==1000) count_for_animation = 0;
-	}
-}
-
-/**
-   * @brief A function used to configure the onboard LEDs
-	 * @param none
-	 * @retval 
-   */
-void config_animation_LEDs(void)
-{	
-	//Configure the GPIO struct for the 4 LEDs on the discovery board
-	GPIO_InitStruct.Pin = GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15; 
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP; 
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FAST; 
-
-	//Initialize GPIO for the LEDs
-	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 }

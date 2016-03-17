@@ -14,12 +14,12 @@
 #include "stm32f4xx_hal.h"
 #include "main.h"
 
-
 /* Exported functions ------------------------------------------------------- */
 extern void update_segment_display(float f);
 extern void clear_segment_pin(void);
 extern void clear_select_pin(void); 
 extern void segment_display_init(void);
+extern void flash_segment_display_alarm(void);
 
 /* Private functions -------------------------------------------------------- */
 void display_number(int number, int decimal);

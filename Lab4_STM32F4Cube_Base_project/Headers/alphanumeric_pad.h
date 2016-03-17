@@ -3,8 +3,8 @@
   * File Name          : alphanumeric_pad.h
   * Description        : 
 	* Author						 : Taha Saifuddin, Richard Cheung
-	* Version            : 1.0.0
-	* Date							 : February 19th, 2016
+	* Version            : 2.0.0
+	* Date							 : March 15th, 2016
   ******************************************************************************
   */
 
@@ -17,7 +17,8 @@
 
 
 /* Exported Variables ------------------------------------------------------- */
-extern int input_value, input_flag, threshold_set_flag; 
+extern int input_value, input_flag, tilt_selection, display_mode; 
+
 /* Exported functions ------------------------------------------------------- */
 
 

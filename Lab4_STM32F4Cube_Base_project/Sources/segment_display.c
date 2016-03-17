@@ -9,14 +9,20 @@
   ******************************************************************************
   */
 	
+/* Includes ------------------------------------------------------------------*/
 #include "segment_display.h"
 
+/* Defines ------------------------------------------------------------------ */
+#define ALARM_RESET 		-1
+#define ALARM_SET 			1
+
+/* Variables -----------------------------------------------------------------*/
 int segment_display_flag;
 int position;
 int number;
 int update_flag ;
 int decimal_position_one, decimal_position_ten;
-
+int count_for_alarm;
 
 /**
    * @brief A function used to update the seven segment display with the temp value
@@ -205,4 +211,24 @@ void clear_segment_pin (void)
 void clear_select_pin (void) 
 {
 	HAL_GPIO_WritePin (GPIOE , GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3| GPIO_PIN_4, GPIO_PIN_RESET); 			
+}
+
+/**
+   * @brief A function used to flash the 7 segment display as overheat alarm
+	 * @retval none
+   */
+void flash_segment_display_alarm()
+{	
+	
+	//Clear the 7segment display
+	if(count_for_alarm >= 700 && count_for_alarm < 1000) {
+		clear_segment_pin();
+	}
+	
+	//Increment the alarm counter
+	count_for_alarm++;
+	
+	//Reset the counter to 0
+	if(count_for_alarm == 1000) count_for_alarm = 0;
+	
 }
