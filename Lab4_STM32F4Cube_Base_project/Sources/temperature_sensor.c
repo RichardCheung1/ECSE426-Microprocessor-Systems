@@ -14,8 +14,6 @@
 
 /* Defines ------------------------------------------------------------------ */
 #define OVERHEAT_TEMP		(float)35.0
-#define ALARM_RESET 		-1
-#define ALARM_SET 			1
 
 /* Private variables ---------------------------------------------------------*/
 int is_alarm_on;

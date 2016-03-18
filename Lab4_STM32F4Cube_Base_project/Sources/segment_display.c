@@ -13,8 +13,7 @@
 #include "segment_display.h"
 
 /* Defines ------------------------------------------------------------------ */
-#define ALARM_RESET 		-1
-#define ALARM_SET 			1
+
 
 /* Variables -----------------------------------------------------------------*/
 int segment_display_flag;
