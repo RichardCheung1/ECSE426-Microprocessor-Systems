@@ -13,8 +13,7 @@
 #include "temperature_sensor.h"
 
 /* Defines ------------------------------------------------------------------ */
-#define ALARM_PERIOD		500
-#define OVERHEAT_TEMP		(float)50.0
+#define OVERHEAT_TEMP		(float)37.0
 #define ALARM_RESET 		-1
 #define ALARM_SET 			1
 
@@ -43,13 +42,14 @@ void configure_init_temp_sensor(void)
 	ADC_InitStruct.DataAlign = ADC_DATAALIGN_RIGHT;
 	ADC_InitStruct.ClockPrescaler = ADC_CLOCKPRESCALER_PCLK_DIV4; 
 	ADC_InitStruct.Resolution = ADC_RESOLUTION_12B; 
-	ADC_InitStruct.ContinuousConvMode = ENABLE; 
+	ADC_InitStruct.ContinuousConvMode = DISABLE; 
 	ADC_InitStruct.DiscontinuousConvMode = DISABLE; 
 	ADC_InitStruct.NbrOfConversion = 1; 
 	ADC_InitStruct.ScanConvMode = DISABLE; 
 	ADC_InitStruct.DMAContinuousRequests = DISABLE; 
-	//ADC_InitStruct.ExternalTrigConv = ADC_SOFTWARE_START;
-	//ADC_InitStruct.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+	ADC_InitStruct.ExternalTrigConv = ADC_SOFTWARE_START;
+	ADC_InitStruct.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+	ADC_InitStruct.EOCSelection = ENABLE;
 	
 	//set ADC_HandleTypeDef parameters
 	ADC1_Handle.Init = ADC_InitStruct; 
@@ -62,10 +62,11 @@ void configure_init_temp_sensor(void)
 	//Configure the channel for the ADC 
 	set_adc_channel(); 
 	
-	//Start polling mode
-	if (HAL_ADC_Start(&ADC1_Handle) != HAL_OK) {
+	//Start polling mode - commented out as we are going to do it in 
+	//each iteration of the while loop of the calculation thread
+	/*if (HAL_ADC_Start(&ADC1_Handle) != HAL_OK) {
 		Error_Handler(ADC_START_FAIL);
-	}
+	}*/
 }
 
 /**
@@ -109,8 +110,8 @@ float convert_voltage_to_celcius (float voltage) {
    */
 float get_data_from_sensor (void) {
 	
-	float voltage;
-	float temperature;
+	float voltage = 0.0f;
+	float temperature = 0.0f;
 	
 	//Get the raw data from the internal temperature sensor
 	voltage = HAL_ADC_GetValue(&ADC1_Handle);
@@ -130,6 +131,11 @@ float get_data_from_sensor (void) {
 	return temperature;
 }
 
+/**
+   * @brief A function used to check if the processor is overheating, and launch the alarm if so
+	 * @param temperature
+	 * @retval none
+   */
 void check_temperature_status(float temperature)
 {
 	//Launches overheating alarm if the temperature is greater than the upper threshold

@@ -17,14 +17,12 @@
 
 /* Exported types ----------------------------------------------------------- */
 extern ADC_HandleTypeDef ADC1_Handle;
+extern int is_alarm_on;
 
 /* Exported functions ------------------------------------------------------- */
+extern void configure_init_temp_sensor(void);
 extern float get_data_from_sensor(void);
 extern float convert_voltage_to_celcius(float voltage);
-extern void configure_init_temp_sensor(void);
-
-/* Private functions -------------------------------------------------------- */
-//int Kalmanfilter_C(float measured_temp, kalman_state* kstate);
-//void Kalmanfilter_init(void);
+extern void check_temperature_status(float temperature);
 
 #endif /** TEMPERATURE_SENSOR_H */

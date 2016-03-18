@@ -49,6 +49,9 @@ void Error_Handler			(uint16_t error_code){
 		case ADC_START_FAIL:
 			printf("ERROR: Error in starting ADC \n");
 			break;
+		case ADC_POLL_FAIL:
+			printf("ERROR: Error in polling ADC for conversion \n");
+			break;
 		default: printf ("ERROR: AN ERROR OCCURED \n");
 		break;
 	}
