@@ -9,9 +9,7 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx_hal.h"              // Keil::Device:STM32Cube HAL:Common
-#include "cmsis_os.h"                   // ARM::CMSIS:RTOS:Keil RTX
-#include "RTE_Components.h"             // Component selection
+
 #include "main.h"
 
 /* Variables -----------------------------------------------------------------*/
@@ -24,14 +22,10 @@ int EXTI0_flag_value;
 int TIM3_flag_value;
 float display_temp, display_pitch, display_roll;
 
-extern void initializeLED_IO			(void);
-//extern void start_Thread_LED			(void);
-//extern void Thread_LED(void const *argument);
-extern void start_Thread_LED			(void);
-extern void Thread_LED(void const *argument);
-
+extern void start_Thread_check_temp(void);
 extern int start_Thread_angle(void);
 extern int start_Thread_temp (void);
+extern void Thread_check_temp(void const *argument);
 extern void Thread_angle (void const *argument);
 extern void Thread_temp (void const *argument);
 
@@ -43,19 +37,11 @@ osMutexDef(temp_mutex);
 osMutexId angle_mutex;
 osMutexDef(angle_mutex);
 
-// ID for thread
-//osThreadId tid_Thread_angle;   
-//osThreadId tid_Thread_temp ;   
-
-//osThreadDef(Thread_temp, osPriorityNormal, 1, 0);
-//osThreadDef(Thread_angle, osPriorityNormal, 1, 0);
-
-osTimerId timerId;
+osTimerId timer_segment_Id;
 osTimerId timer_keypad_Id;
 
 void Timer_Callback1  (void const *arg);
 void Timer_Callback2  (void const *arg);
-
 
 osTimerDef (Timer1, Timer_Callback1);
 osTimerDef (Timer2, Timer_Callback2);
@@ -107,26 +93,6 @@ void SystemClock_Config(void) {
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
   HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5);
 }
-
-/**
-  * Main function
-  */
-//int main (void) {
-
-//  osKernelInitialize();                     /* initialize CMSIS-RTOS          */
-
-//  HAL_Init();                               /* Initialize the HAL Library     */
-
-//  SystemClock_Config();                     /* Configure the System Clock     */
-
-//	/* User codes goes here*/
-//  initializeLED_IO();                       /* Initialize LED GPIO Buttons    */
-//  start_Thread_LED();                       /* Create LED thread              */
-//	/* User codes ends here*/
-//  
-//	osKernelStart();                          /* start thread execution         */
-//}
-//---------------------------------------------------------------
 
 /**
    * @brief A function that is called when the ostimer is done which updates the display
@@ -198,12 +164,13 @@ int main(void)
 	// create thread functions 
 	start_Thread_angle();
 	start_Thread_temp();
+	start_Thread_check_temp(); 
 	
 	//starts timer
-	timerId = osTimerCreate (osTimer(Timer1), osTimerPeriodic, (void *) 0);
+	timer_segment_Id = osTimerCreate (osTimer(Timer1), osTimerPeriodic, (void *) 0);
 	timer_keypad_Id = osTimerCreate (osTimer(Timer2), osTimerPeriodic, (void *) 0);
 
-	osTimerStart (timerId, 2);
+	osTimerStart (timer_segment_Id, 2);
 	osTimerStart (timer_keypad_Id, 1);
 
  /* start thread execution         */

@@ -3,7 +3,7 @@
   * @author  Taha Saifuddin, Richard Cheung
 	* @version V1.0.0
   * @date    17-March-2016
-  * @brief   This file implements the angle and temp calculation thread, and a  
+  * @brief   This file implements the display temp selection thread, and a  
   *					 function which creates and starts the thread	
   ******************************************************************************
   */
@@ -15,8 +15,8 @@
 void Thread_temp (void const *argument);                 // thread function
 osThreadId tid_Thread_temp;                              // thread id
 osThreadDef(Thread_temp, osPriorityNormal, 1, 0);
-int TIM_count_updated;
-extern int display_counter; 
+int display_counter; 
+
 /*----------------------------------------------------------------------------
  *      Create the thread within RTOS context
  *---------------------------------------------------------------------------*/
@@ -32,7 +32,7 @@ int start_Thread_temp (void) {
  *---------------------------------------------------------------------------*/
 void Thread_temp (void const *argument) {
 	//Variables to store temperature
-	float temperature = 0.0f;
+	//float temperature = 0.0f;
 	display_temp = 0.0f;
 	display_counter = 0;
 	
@@ -40,41 +40,15 @@ void Thread_temp (void const *argument) {
 		osSignalWait(0x01, osWaitForever);
 		osMutexWait(temp_mutex, osWaitForever);
 		if (display_mode == 0) {
-			//Start the ADC
-			if (HAL_ADC_Start(&ADC1_Handle) != HAL_OK) {
-				Error_Handler(ADC_START_FAIL);
-			} 
-			else {
-			//Check for successful conversion of the polled analog value to a digital reading
-				if(HAL_ADC_PollForConversion(&ADC1_Handle, 1000000) != HAL_OK) {
-					Error_Handler(ADC_POLL_FAIL);
-				} 
-				else {
-					//Measure temperature from sensor 
-					if (display_counter % 10 == 0) {
-						temperature = get_data_from_sensor();
-					}
-				}
-			__HAL_ADC_CLEAR_FLAG(&ADC1_Handle,ADC_FLAG_EOC);
-			}
-			//printf("FilteredTemp: %f\n", temperature);
-			display_temp = temperature;
-			
-			//Check temperature status
-			if (display_counter % 125 == 0) {
-				check_temperature_status(display_temp);
-			}
-			
-			if (display_counter % 250 == 0 ) {
+			if (display_counter % 250 == 0) {
 				//check_temperature_status(display_temp);
-				display = display_temp;			
+				display = display_temp;	
+				display_counter = 0;
 			}
 			
 		}		
 		osMutexRelease(temp_mutex);
 		//osSignalSet(main_thread_id, 0x01);
-		
-		TIM_count_updated++;
 	}
 }
 
@@ -86,6 +60,6 @@ void Thread_temp (void const *argument) {
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	TIM3_counter ++;
-	display_counter++; 
+	if(display_mode == 0) display_counter++; 
 	osSignalSet(tid_Thread_temp, 0x01);
 }

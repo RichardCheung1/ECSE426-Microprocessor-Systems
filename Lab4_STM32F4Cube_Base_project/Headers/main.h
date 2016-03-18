@@ -50,7 +50,8 @@
 #include "accelerometer.h"
 #include "math.h"
 #include "temperature_sensor.h"
-#include "Thread_calculation.h"
+#include "cmsis_os.h"                   // ARM::CMSIS:RTOS:Keil RTX
+#include "RTE_Components.h"             // Component selection
 
 #define INTERRUPT_ACTIVE_FLAG 1
 /* Structs -------------------------------------------------------------------*/
@@ -68,6 +69,7 @@ extern osMutexId angle_mutex, temp_mutex;
 extern osThreadId main_thread_id;
 extern int EXTI0_flag_value;
 extern float display;
+extern float display_temp, display_pitch, display_roll;
 
 /* Exported constants --------------------------------------------------------*/
 
