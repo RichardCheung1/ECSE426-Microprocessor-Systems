@@ -15,6 +15,7 @@ int column;
 int row;
 int keypad_state;
 int input_flag;
+
 //set to zero(A) for temp mode, one(B) for tilt angle mode, and minus one if no mode is selected
 int display_mode = -1;
 
@@ -85,18 +86,22 @@ char get_key()
 	return key;
 }
 /**
-   * @brief function to handle debouncer
+   * @brief FSM to implement the debouncer algorithm
 	 * @param 
    */
 void debouncer()
 {
 	switch(keypad_state){
+		
+		//If the keypad is in the idle state
 		case IDLE:
 			TIM3_counter = 0;
 			if(column != -1 && row != -1){
 				keypad_state = DEBOUNCING;
 			}
 			break;
+			
+		//If the keypad is in debouncing state
 		case DEBOUNCING:
 			TIM3_counter = 0;
 			if(TIM3_counter % 1000 == 0){
@@ -105,6 +110,8 @@ void debouncer()
 				keypad_state = PRESSED;
 			}
 			break;
+			
+		//If the keypad is in pressed state
 		case PRESSED:
 			if(column == -1 || row == -1){
 				keypad_state = RELEASED;
@@ -124,7 +131,7 @@ void debouncer()
 /**
    * @brief function to determine the column that the key is pressed, where PIN0,PIN1,PIN2,PIN3
 						are respectively column 1,2,3,4
-	 * @param 
+	 * @retval integer that signifies which column detects a press
    */
 int get_col() 
 {
@@ -141,12 +148,8 @@ int get_col()
 	GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
 	GPIO_InitStruct.Pull = GPIO_NOPULL; 
 	HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
-//		printf ("%d ", HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_1));
-//		printf ("%d ", HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_3));
-//		printf ("%d ", HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_5));
-//		printf ("%d \n ", HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_6));
-//	
 	
+	//Check which, if any, button(pin) is pressed
 	if ( HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_1) == GPIO_PIN_RESET ) {
 		return 0;
 	}
@@ -166,7 +169,7 @@ int get_col()
 /**
    * @brief function to determine the row that the key is pressed, where PIN4,PIN5,PIN6,PIN7
 						are respectively row 1,2,3,4
-	 * @param 
+	 * @retval integer that signifies which row detects a press 
    */
 int get_row() 
 {
@@ -184,11 +187,7 @@ int get_row()
 	GPIO_InitStruct.Pull = GPIO_PULLUP; 
 	HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 	
-//		printf ("%d ", HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_12));
-//		printf ("%d ", HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_13));
-//		printf ("%d ", HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_14));
-//		printf ("%d \n ", HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_15));
-	
+	//Check which, if any, button(pin) is pressed
 	if ( HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_12) == GPIO_PIN_RESET ) {
 		return 0;
 	}

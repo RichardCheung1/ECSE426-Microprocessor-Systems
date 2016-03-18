@@ -22,24 +22,30 @@ GPIO_InitTypeDef 				LED_configuration;
  *---------------------------------------------------------------------------*/
 int start_Thread_check_temp (void) {
 
-  tid_Thread_check_temp = osThreadCreate(osThread(Thread_check_temp ), NULL); // Start LED_Thread
+  tid_Thread_check_temp = osThreadCreate(osThread(Thread_check_temp ), NULL); // Start Temp Check Thread
   if (!tid_Thread_check_temp) return(-1); 
   return(0);
 }
 
  /*----------------------------------------------------------------------------
-*      Thread  'LED_Thread': Toggles LED
+*      Implementation of the temperature checking thread
  *---------------------------------------------------------------------------*/
 void Thread_check_temp (void const *argument) {
-	float temperature =0.0f ;
+	
+	float temperature = 0.0f;
+	
 	while(1){
+		
+		//Using a delay of 10ms so that the frequency of temperature sampling is 100Hz
 		osDelay(10);
+		
 		//Start the ADC
 		if (HAL_ADC_Start(&ADC1_Handle) != HAL_OK) {
 			Error_Handler(ADC_START_FAIL);
 		} 
 		else {
-		//Check for successful conversion of the polled analog value to a digital reading
+			
+			//Check for successful conversion of the polled analog value to a digital reading
 			if(HAL_ADC_PollForConversion(&ADC1_Handle, 1000000) != HAL_OK) {
 				Error_Handler(ADC_POLL_FAIL);
 			} 
@@ -47,8 +53,12 @@ void Thread_check_temp (void const *argument) {
 				//Measure temperature from sensor 
 				temperature = get_data_from_sensor();
 			}
-		__HAL_ADC_CLEAR_FLAG(&ADC1_Handle,ADC_FLAG_EOC);
+			
+			//Clear the EOC flag
+			__HAL_ADC_CLEAR_FLAG(&ADC1_Handle,ADC_FLAG_EOC);
 		}
+		
+		//Pass the temp value to the temperature checking function
 		display_temp = temperature;
 		check_temperature_status(display_temp);			
 	}
