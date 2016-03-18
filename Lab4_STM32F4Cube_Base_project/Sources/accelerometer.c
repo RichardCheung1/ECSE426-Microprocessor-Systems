@@ -155,12 +155,12 @@ void print_filtered_acceleration(void)
    */
 void calculate_angles(void)
 {
-//	pitch = atan2(acceleration_normalized[0], sqrt(acceleration_normalized[1]*acceleration_normalized[1] + acceleration_normalized[2]*acceleration_normalized[2])) * 180/ 3.14159265;
-//	roll = atan2(acceleration_normalized[1], sqrt(acceleration_normalized[0]*acceleration_normalized[0] + acceleration_normalized[2]*acceleration_normalized[2])) * 180/ 3.14159265;
-//	
-//	//Normalize the angles to show within a 0 to 180 degree range
-//	pitch += 90;
-//	roll += 90;
+	//pitch = atan2(acceleration_normalized[0], sqrt(acceleration_normalized[1]*acceleration_normalized[1] + acceleration_normalized[2]*acceleration_normalized[2])) * 180/ 3.14159265;
+	//roll = atan2(acceleration_normalized[1], sqrt(acceleration_normalized[0]*acceleration_normalized[0] + acceleration_normalized[2]*acceleration_normalized[2])) * 180/ 3.14159265;
+	
+	//Normalize the angles to show within a 0 to 180 degree range
+	//pitch = pitch + 90;
+	//roll = roll + 90;
 	
 	pitch = atan2(acceleration_normalized[0],acceleration_normalized[2]) * 180/ 3.14159265;
 	roll = atan2(acceleration_normalized[1],acceleration_normalized[2]) * 180/ 3.14159265;

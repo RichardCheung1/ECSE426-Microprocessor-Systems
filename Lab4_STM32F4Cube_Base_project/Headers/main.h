@@ -66,6 +66,8 @@ extern int TIM3_counter;
 extern kalman_state x_kstate, y_kstate, z_kstate, temp_kstate;
 extern osMutexId angle_mutex, temp_mutex;
 extern osThreadId main_thread_id;
+extern int EXTI0_flag_value;
+extern float display;
 
 /* Exported constants --------------------------------------------------------*/
 

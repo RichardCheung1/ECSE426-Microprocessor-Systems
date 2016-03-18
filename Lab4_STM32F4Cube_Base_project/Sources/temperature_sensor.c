@@ -13,7 +13,7 @@
 #include "temperature_sensor.h"
 
 /* Defines ------------------------------------------------------------------ */
-#define OVERHEAT_TEMP		(float)15.0
+#define OVERHEAT_TEMP		(float)37.0
 #define ALARM_RESET 		-1
 #define ALARM_SET 			1
 
@@ -141,7 +141,10 @@ void check_temperature_status(float temperature)
 	//Launches overheating alarm if the temperature is greater than the upper threshold
 	if(temperature > OVERHEAT_TEMP) {
 		flash_segment_display_alarm();
-		
+	}
+	else {
+		is_alarm_on = 0;
+		count_for_alarm = 0;
 	}
 }
 

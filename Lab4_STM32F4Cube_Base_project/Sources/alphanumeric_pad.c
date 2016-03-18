@@ -20,6 +20,7 @@ int display_mode = -1;
 
 //zero represents pitch angle, and one represents tilt angle
 int tilt_selection = 0;
+
 char key = ' ';
 const int IDLE = 0;
 const int DEBOUNCING = 1;
@@ -46,26 +47,22 @@ void set_input(char key)
 		//Case for showing the Pitch angle
 		case '1':
 			if(display_mode == 1) tilt_selection = 0;
-			osSignalSet(main_thread_id,0x01);
 
 			break;
 		//Case for showing the Roll angle
 		case '2':
 			if(display_mode == 1) tilt_selection = 1;
-			osSignalSet(main_thread_id, 0x01);
 
 			break;
 		//Case for Temperature display mode selection
 		case 'A':
 			display_mode = 0;
-			osSignalSet(main_thread_id, 0x01);
 
 			break;
 		//Case for Tilt Angle mode selection
 		case 'B':
 			display_mode = 1;
-			osSignalSet(main_thread_id, 0x01);
-
+			tilt_selection = 0; //default showing angle is pitch
 			break;
 		//No other dependencies from keypad
 //		default:

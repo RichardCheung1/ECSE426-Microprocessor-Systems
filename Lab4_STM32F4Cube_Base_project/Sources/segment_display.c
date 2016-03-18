@@ -221,13 +221,14 @@ void clear_select_pin (void)
 void flash_segment_display_alarm()
 {	
 	//Clear the 7segment display
-	if(count_for_alarm >= 700 && count_for_alarm < 1000) {
+	if(count_for_alarm >= 350 && count_for_alarm < 499) {
 		is_alarm_on = 1;
+		clear_segment_pin();
 		clear_select_pin();
-	}
+	} else is_alarm_on = 0;
 	
 	//Reset the counter to 0
-	if(count_for_alarm >= 1000){
+	if(count_for_alarm >= 500){
 		is_alarm_on = 0;
 		count_for_alarm = 0;
 	}
