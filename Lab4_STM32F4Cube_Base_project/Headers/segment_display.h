@@ -13,6 +13,7 @@
 
 #include "stm32f4xx_hal.h"
 #include "main.h"
+#include "cmsis_os.h"                   // ARM::CMSIS:RTOS:Keil RTX
 
 /* Exported functions ------------------------------------------------------- */
 extern void update_segment_display(float f);
@@ -26,7 +27,7 @@ void display_number(int number, int decimal);
 int get_decimal_position(float f) ;
 void delay(int i);
 
-extern int segment_display_flag;
+extern int count_for_alarm;
 extern	int position ;
 
 #endif /* __SEGMENT_DISPLAY_H */

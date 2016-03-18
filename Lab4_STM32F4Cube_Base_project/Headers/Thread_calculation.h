@@ -22,8 +22,6 @@
 /* Exported types ----------------------------------------------------------- */
 extern float display_temp, display_pitch, display_roll;
 
-/* Exported functions ------------------------------------------------------- */
-extern int start_Thread_calculation (void);
 
 /* Private functions -------------------------------------------------------- */
 //int Kalmanfilter_C(float measured_temp, kalman_state* kstate);

@@ -50,16 +50,22 @@
 #include "accelerometer.h"
 #include "math.h"
 #include "temperature_sensor.h"
+#include "Thread_calculation.h"
 
+#define INTERRUPT_ACTIVE_FLAG 1
 /* Structs -------------------------------------------------------------------*/
 typedef struct stateInfo{
 	float q, r, x, p, k;
 }kalman_state;
 
+
+
 /* Exported types ------------------------------------------------------------*/
 extern GPIO_InitTypeDef GPIO_InitStruct;
 extern int TIM3_counter;
 extern kalman_state x_kstate, y_kstate, z_kstate, temp_kstate;
+extern osMutexId angle_mutex, temp_mutex;
+extern osThreadId main_thread_id;
 
 /* Exported constants --------------------------------------------------------*/
 
@@ -68,6 +74,10 @@ extern kalman_state x_kstate, y_kstate, z_kstate, temp_kstate;
 /* Exported functions ------------------------------------------------------- */
 extern int Kalmanfilter_C(float measured_acceleration, kalman_state* kstate);
 
+/* Private functions -------------------------------------------------------- */
+int start_Thread_main (void);
+int	start_Thread_angle(void);
+int	start_Thread_temp(void);
 #endif /* __MAIN_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

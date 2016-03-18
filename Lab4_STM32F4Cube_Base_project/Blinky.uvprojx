@@ -430,6 +430,46 @@
               <FileType>1</FileType>
               <FilePath>.\Sources\supporting_functions.c</FilePath>
             </File>
+            <File>
+              <FileName>accelerometer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\accelerometer.c</FilePath>
+            </File>
+            <File>
+              <FileName>alphanumeric_pad.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\alphanumeric_pad.c</FilePath>
+            </File>
+            <File>
+              <FileName>segment_display.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\segment_display.c</FilePath>
+            </File>
+            <File>
+              <FileName>timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\timer.c</FilePath>
+            </File>
+            <File>
+              <FileName>fput_debug.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\fput_debug.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_it.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\stm32f4xx_it.c</FilePath>
+            </File>
+            <File>
+              <FileName>temperature_sensor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\temperature_sensor.c</FilePath>
+            </File>
+            <File>
+              <FileName>Thread_calculation.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\Thread_calculation.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -439,6 +479,56 @@
               <FileName>LIS3DSH.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Accelerometer\src\LIS3DSH.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Headers</GroupName>
+          <Files>
+            <File>
+              <FileName>accelerometer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\accelerometer.h</FilePath>
+            </File>
+            <File>
+              <FileName>alphanumeric_pad.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\alphanumeric_pad.h</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\main.h</FilePath>
+            </File>
+            <File>
+              <FileName>segment_display.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\segment_display.h</FilePath>
+            </File>
+            <File>
+              <FileName>supporting_functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\supporting_functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>timer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\timer.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_it.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\stm32f4xx_it.h</FilePath>
+            </File>
+            <File>
+              <FileName>temperature_sensor.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\temperature_sensor.h</FilePath>
+            </File>
+            <File>
+              <FileName>Thread_calculation.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\Thread_calculation.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -875,6 +965,46 @@
               <FileType>1</FileType>
               <FilePath>.\Sources\supporting_functions.c</FilePath>
             </File>
+            <File>
+              <FileName>accelerometer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\accelerometer.c</FilePath>
+            </File>
+            <File>
+              <FileName>alphanumeric_pad.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\alphanumeric_pad.c</FilePath>
+            </File>
+            <File>
+              <FileName>segment_display.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\segment_display.c</FilePath>
+            </File>
+            <File>
+              <FileName>timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\timer.c</FilePath>
+            </File>
+            <File>
+              <FileName>fput_debug.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\fput_debug.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_it.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\stm32f4xx_it.c</FilePath>
+            </File>
+            <File>
+              <FileName>temperature_sensor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\temperature_sensor.c</FilePath>
+            </File>
+            <File>
+              <FileName>Thread_calculation.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\Thread_calculation.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -884,6 +1014,56 @@
               <FileName>LIS3DSH.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Accelerometer\src\LIS3DSH.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Headers</GroupName>
+          <Files>
+            <File>
+              <FileName>accelerometer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\accelerometer.h</FilePath>
+            </File>
+            <File>
+              <FileName>alphanumeric_pad.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\alphanumeric_pad.h</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\main.h</FilePath>
+            </File>
+            <File>
+              <FileName>segment_display.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\segment_display.h</FilePath>
+            </File>
+            <File>
+              <FileName>supporting_functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\supporting_functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>timer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\timer.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_it.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\stm32f4xx_it.h</FilePath>
+            </File>
+            <File>
+              <FileName>temperature_sensor.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\temperature_sensor.h</FilePath>
+            </File>
+            <File>
+              <FileName>Thread_calculation.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\Thread_calculation.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1319,6 +1499,46 @@
               <FileType>1</FileType>
               <FilePath>.\Sources\supporting_functions.c</FilePath>
             </File>
+            <File>
+              <FileName>accelerometer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\accelerometer.c</FilePath>
+            </File>
+            <File>
+              <FileName>alphanumeric_pad.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\alphanumeric_pad.c</FilePath>
+            </File>
+            <File>
+              <FileName>segment_display.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\segment_display.c</FilePath>
+            </File>
+            <File>
+              <FileName>timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\timer.c</FilePath>
+            </File>
+            <File>
+              <FileName>fput_debug.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\fput_debug.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_it.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\stm32f4xx_it.c</FilePath>
+            </File>
+            <File>
+              <FileName>temperature_sensor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\temperature_sensor.c</FilePath>
+            </File>
+            <File>
+              <FileName>Thread_calculation.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\Thread_calculation.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1328,6 +1548,56 @@
               <FileName>LIS3DSH.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Accelerometer\src\LIS3DSH.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Headers</GroupName>
+          <Files>
+            <File>
+              <FileName>accelerometer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\accelerometer.h</FilePath>
+            </File>
+            <File>
+              <FileName>alphanumeric_pad.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\alphanumeric_pad.h</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\main.h</FilePath>
+            </File>
+            <File>
+              <FileName>segment_display.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\segment_display.h</FilePath>
+            </File>
+            <File>
+              <FileName>supporting_functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\supporting_functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>timer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\timer.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_it.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\stm32f4xx_it.h</FilePath>
+            </File>
+            <File>
+              <FileName>temperature_sensor.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\temperature_sensor.h</FilePath>
+            </File>
+            <File>
+              <FileName>Thread_calculation.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\Thread_calculation.h</FilePath>
             </File>
           </Files>
         </Group>

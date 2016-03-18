@@ -17,13 +17,48 @@
 /* Variables -----------------------------------------------------------------*/
 GPIO_InitTypeDef GPIO_InitStruct;
 kalman_state x_kstate, y_kstate, z_kstate, temp_kstate;
+
+int TIM3_counter, alarm_flag;
+float display;
+int EXTI0_flag_value;
+int TIM3_flag_value;
+float display_temp, display_pitch, display_roll;
+
 extern void initializeLED_IO			(void);
 //extern void start_Thread_LED			(void);
 //extern void Thread_LED(void const *argument);
 extern void start_Thread_LED			(void);
 extern void Thread_LED(void const *argument);
 extern osThreadId tid_Thread_LED;
-int TIM3_counter;
+
+// Mutex for temp and angle
+osMutexId temp_mutex;
+osMutexDef(temp_mutex);
+osMutexId angle_mutex;
+osMutexDef(angle_mutex);
+
+void Thread_temp (void const *argument);
+void Thread_angle (void const *argument);
+void main_thread (void const *argument);                 // thread function
+// ID for thread
+osThreadId main_thread_id;
+osThreadId tid_Thread_angle;   
+osThreadId tid_Thread_temp ;   
+
+osThreadDef(Thread_temp, osPriorityNormal, 1, 0);
+osThreadDef(Thread_angle, osPriorityNormal, 1, 0);
+osThreadDef(main_thread, osPriorityNormal, 1, 0);
+
+osTimerId timerId;
+osTimerId timer_keypad_Id;
+
+void Timer_Callback1  (void const *arg);
+void Timer_Callback2  (void const *arg);
+
+
+osTimerDef (Timer1, Timer_Callback1);
+osTimerDef (Timer2, Timer_Callback2);
+
 
 /**
 	These lines are mandatory to make CMSIS-RTOS RTX work with te new Cube HAL
@@ -90,13 +125,129 @@ void SystemClock_Config(void) {
 //  
 //	osKernelStart();                          /* start thread execution         */
 //}
-
 //---------------------------------------------------------------
+
+void main_thread(void const *argument)
+{
+//		while(1){
+//		osSignalWait(0x01,osWaitForever);
+//		if(display_mode == 0){
+//			osMutexWait(angle_mutex, osWaitForever);
+//			display = tilt_selection == 0 ?  display_roll: display_pitch;
+//			osMutexRelease(angle_mutex);
+//		}
+//		else if(display_mode == 1){
+//			osMutexWait(temp_mutex, osWaitForever);
+//			display = display_temp;
+//			osMutexRelease(temp_mutex);
+//		}
+//		else{
+//			clear_segment_pin();
+//			clear_select_pin();
+//		}
+//	}
+}
+
+ /*----------------------------------------------------------------------------
+*      Thread  'Thread_temp': provide values for temperatures
+ *---------------------------------------------------------------------------*/
+void Thread_temp (void const *argument) {
+	//Variables to store temperature
+	float temperature = 0.0f;
+	display_temp = 0.0f;
+	while(1){
+		osSignalWait(0x01, osWaitForever);
+		osMutexWait(temp_mutex, osWaitForever);
+		if (display_mode == 0) {
+			//Start the ADC
+			if (HAL_ADC_Start(&ADC1_Handle) != HAL_OK) {
+				Error_Handler(ADC_START_FAIL);
+			} 
+			else {
+			//Check for successful conversion of the polled analog value to a digital reading
+				if(HAL_ADC_PollForConversion(&ADC1_Handle, 1000000) != HAL_OK) {
+					Error_Handler(ADC_POLL_FAIL);
+				} 
+				else {
+					//Measure temperature from sensor every 10ms -> 100Hz frequency
+					temperature = get_data_from_sensor();
+				}
+			__HAL_ADC_CLEAR_FLAG(&ADC1_Handle,ADC_FLAG_EOC);
+			}
+			//printf("FilteredTemp: %f\n", temperature);
+			display_temp = temperature;
+			if (TIM3_counter % 100 == 0) {
+				check_temperature_status(display_temp);
+				display = display_temp;		
+			}
+		}		
+		osMutexRelease(temp_mutex);
+		//osSignalSet(main_thread_id, 0x01);
+	}
+}
+
+
+void Thread_angle (void const *argument) {
+	display_pitch = 0.0f;
+	display_roll = 0.0f;
+	while(1){
+		osSignalWait(0x01, osWaitForever);
+		osMutexWait(angle_mutex, osWaitForever);
+		if (display_mode == 1) {		
+			//If the EXTI0 callback function is called and flag is set to active, read accelerometer values
+			if(EXTI0_flag_value == INTERRUPT_ACTIVE_FLAG) {
+					//Get the accelerometer readings
+				get_calibrated_acceleration();
+					//Reset the flag
+					EXTI0_flag_value = 0;
+			}
+			if ( tilt_selection == 1) {
+				display_pitch = pitch;
+			}
+			if (tilt_selection == 0) {
+				display_roll = roll;
+			}
+			if (TIM3_counter % 200 == 0) {
+				display = tilt_selection == 0 ?  display_roll: display_pitch;
+			}
+		}
+		osMutexRelease(angle_mutex);
+		//osSignalSet(main_thread_id, 0x01);
+	}
+}
+
+/**
+   * @brief A function that is called when the ostimer is done which updates the display
+	 * @param 
+	 * @retval 
+   */
+void Timer_Callback1  (void const *arg)
+{
+	if(display_mode != -1) {
+
+		//Increment the alarm counter
+		count_for_alarm++;
+		if (is_alarm_on == 0) {
+			update_segment_display(fabsf(display));
+		}
+	}
+}	
+/**
+   * @brief A function that is called when the ostimer is done which checks keypad
+	 * @param 
+	 * @retval 
+   */
+void Timer_Callback2  (void const *arg)
+{
+	set_input(get_key());
+}	
+
 int main(void)
  {	
+	osKernelInitialize();                     /* initialize CMSIS-RTOS          */
 	//int i; 
-  /* MCU Configuration----------------------------------------------------------*/
-  
+
+ /* MCU Configuration----------------------------------------------------------*/
 	HAL_Init();
 
   /* Configure the system clock */
@@ -125,6 +276,53 @@ int main(void)
 	
 	//Initialize the kalman filter structs
 	Kalmanfilter_init();
+
+	// create mutex 
+	temp_mutex = osMutexCreate(osMutex(temp_mutex));
+	angle_mutex = osMutexCreate(osMutex(angle_mutex));
+
+	// create thread functions 
+	start_Thread_angle();
+	start_Thread_temp();
+	start_Thread_main();
+	
+	//starts timer
+	timerId = osTimerCreate (osTimer(Timer1), osTimerPeriodic, (void *) 0);
+	timer_keypad_Id = osTimerCreate (osTimer(Timer2), osTimerPeriodic, (void *) 0);
+
+	osTimerStart (timerId, 2);
+	osTimerStart (timer_keypad_Id, 1);
+
+ /* start thread execution         */
+	osKernelStart();                         
+}
+/*----------------------------------------------------------------------------
+ *      Create the thread within RTOS context
+ *---------------------------------------------------------------------------*/
+int start_Thread_temp (void) {
+
+  tid_Thread_temp = osThreadCreate(osThread(Thread_temp), NULL); // Start calculation_Thread
+  if (!tid_Thread_temp) return(-1); 
+  return(0);
+}
+/*----------------------------------------------------------------------------
+ *      Create the thread within RTOS context
+ *---------------------------------------------------------------------------*/
+int start_Thread_angle (void) {
+
+  tid_Thread_angle = osThreadCreate(osThread(Thread_angle), NULL); // Start calculation_Thread
+  if (!tid_Thread_angle) return(-1); 
+  return(0);
+} 
+
+ /*----------------------------------------------------------------------------
+ *      Create the thread within RTOS context
+ *---------------------------------------------------------------------------*/
+int start_Thread_main (void) {
+
+  main_thread_id = osThreadCreate(osThread(main_thread), NULL); // Start main_thread
+  if (!main_thread_id) return(-1); 
+  return(0);
 }
 //------------------------------------------------------------------------------
 /**
@@ -182,4 +380,25 @@ void Kalmanfilter_init(void) {
 	temp_kstate.x = 28.0f; //estimated value
 	temp_kstate.p = 2.0f; //estimation error covariance
 	temp_kstate.k = 0.00f; //kalman gain
+}
+/**
+   * @brief Sets the EXTI0_flag_value flag to 1
+   * @param uint16_t GPIO_Pin
+   * @retval None
+   */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	osSignalSet( tid_Thread_temp, 0x01);
+	EXTI0_flag_value = 1;
+}
+
+/**
+   * @brief Sets the TIM3 interrupt flag to 1
+   * @param *htim
+   * @retval None
+   */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	TIM3_counter ++;
+	osSignalSet( tid_Thread_angle, 0x01);
 }

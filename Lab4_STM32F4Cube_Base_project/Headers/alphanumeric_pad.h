@@ -14,20 +14,18 @@
 #include "stm32f4xx_hal.h"
 #include "main.h"
 #include "timer.h"
+#include "cmsis_os.h"                   // ARM::CMSIS:RTOS:Keil RTX
 
 
 /* Exported Variables ------------------------------------------------------- */
 extern int input_value, input_flag, tilt_selection, display_mode; 
-
 /* Exported functions ------------------------------------------------------- */
-
-
+extern char get_key(void) ;
+extern void set_input(char key);
 /* Private functions -------------------------------------------------------- */
 int get_col(void);
 int get_row(void);
-char get_key(void) ;
 void debouncer(void);
-void set_input(char key);
 
 
 #endif /* __ALPHANUMERIC_PAD_H */

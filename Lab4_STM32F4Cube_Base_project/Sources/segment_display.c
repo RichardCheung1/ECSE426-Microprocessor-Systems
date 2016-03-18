@@ -52,6 +52,7 @@ void update_segment_display(float f)
 	}
 		// turn off all selected pins
 		clear_select_pin();
+		clear_segment_pin();
 		switch (position) 
 		{
 			// first digit will be set and light while the rest is off
@@ -219,16 +220,15 @@ void clear_select_pin (void)
    */
 void flash_segment_display_alarm()
 {	
-	
 	//Clear the 7segment display
 	if(count_for_alarm >= 700 && count_for_alarm < 1000) {
-		clear_segment_pin();
+		is_alarm_on = 1;
+		clear_select_pin();
 	}
 	
-	//Increment the alarm counter
-	count_for_alarm++;
-	
 	//Reset the counter to 0
-	if(count_for_alarm == 1000) count_for_alarm = 0;
-	
+	if(count_for_alarm >= 1000){
+		is_alarm_on = 0;
+		count_for_alarm = 0;
+	}
 }

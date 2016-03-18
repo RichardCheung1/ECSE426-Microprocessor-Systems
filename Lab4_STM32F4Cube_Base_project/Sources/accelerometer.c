@@ -35,6 +35,7 @@ float calibration_param_matrix[4][3] = {
 	{0.00214820029, 0.00162097280, -0.0131357405}
 };
 
+
 /* Private function prototypes -----------------------------------------------*/
 void print_filtered_acceleration(void);
 int Kalmanfilter_C(float measured_acceleration, kalman_state* kstate);
@@ -118,7 +119,7 @@ void get_calibrated_acceleration(void)
 			acceleration_normalized[i] += acceleration_filtered[j]*calibration_param_matrix[j][i];
 		}
 		//adding 1*ACC10/20/30
-		acceleration_normalized[i] += calibration_param_matrix[4][i];
+		acceleration_normalized[i] += calibration_param_matrix[3][i];
 	}
 	
 	//Print the filtered values
@@ -154,15 +155,16 @@ void print_filtered_acceleration(void)
    */
 void calculate_angles(void)
 {
-	pitch = atan2(acceleration_normalized[0], sqrt(acceleration_normalized[1]*acceleration_normalized[1] + acceleration_normalized[2]*acceleration_normalized[2])) * 180/ 3.14159265;
-	roll = atan2(acceleration_normalized[1], sqrt(acceleration_normalized[0]*acceleration_normalized[0] + acceleration_normalized[2]*acceleration_normalized[2])) * 180/ 3.14159265;
+//	pitch = atan2(acceleration_normalized[0], sqrt(acceleration_normalized[1]*acceleration_normalized[1] + acceleration_normalized[2]*acceleration_normalized[2])) * 180/ 3.14159265;
+//	roll = atan2(acceleration_normalized[1], sqrt(acceleration_normalized[0]*acceleration_normalized[0] + acceleration_normalized[2]*acceleration_normalized[2])) * 180/ 3.14159265;
+//	
+//	//Normalize the angles to show within a 0 to 180 degree range
+//	pitch += 90;
+//	roll += 90;
 	
-	//Normalize the angles to show within a 0 to 180 degree range
-	pitch += 90;
-	roll += 90;
+	pitch = atan2(acceleration_normalized[0],acceleration_normalized[2]) * 180/ 3.14159265;
+	roll = atan2(acceleration_normalized[1],acceleration_normalized[2]) * 180/ 3.14159265;
 	
-	//pitch = atan2(acceleration_normalized[0],acceleration_normalized[2]) * 180/ 3.14159265;
-	//roll = atan2(acceleration_normalized[1],acceleration_normalized[2]) * 180/ 3.14159265;
 	
 	//Reinitialize the normalized array
 	acceleration_normalized[0] =0 ;

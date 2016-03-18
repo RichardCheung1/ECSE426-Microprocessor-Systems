@@ -11,17 +11,15 @@
 	
 #include "alphanumeric_pad.h"
 
-
 int column;
 int row;
 int keypad_state;
-
+int input_flag;
 //set to zero(A) for temp mode, one(B) for tilt angle mode, and minus one if no mode is selected
-int display_mode;
+int display_mode = -1;
 
 //zero represents pitch angle, and one represents tilt angle
-int tilt_selection;
-
+int tilt_selection = 0;
 char key = ' ';
 const int IDLE = 0;
 const int DEBOUNCING = 1;
@@ -35,34 +33,44 @@ char keys[4][4] =
  {'*', '0', '#', 'D'},
 };
 
+/* Functions -----------------------------------------------------------------*/
 /**
    * @brief function to set the input value with the keys pressed
 	 * @param takes parameter key from get_key in order to do map the right char
    */
 void set_input(char key)
 {
+	//printf("%c\n", key);
 	switch (key) 
 	{
 		//Case for showing the Pitch angle
 		case '1':
 			if(display_mode == 1) tilt_selection = 0;
+			osSignalSet(main_thread_id,0x01);
+
 			break;
 		//Case for showing the Roll angle
 		case '2':
 			if(display_mode == 1) tilt_selection = 1;
+			osSignalSet(main_thread_id, 0x01);
+
 			break;
 		//Case for Temperature display mode selection
 		case 'A':
 			display_mode = 0;
+			osSignalSet(main_thread_id, 0x01);
+
 			break;
 		//Case for Tilt Angle mode selection
 		case 'B':
 			display_mode = 1;
+			osSignalSet(main_thread_id, 0x01);
+
 			break;
 		//No other dependencies from keypad
-		default:
-			if(display_mode == 0 || display_mode == 1) display_mode = -1;
-			break;
+//		default:
+//			if(display_mode == 0 || display_mode == 1) display_mode = -1;
+//			break;
 	}
 }
 
@@ -76,7 +84,7 @@ char get_key()
 	row = get_row();
 	
 	debouncer();
-	//printf("%c %d%d\n", key, row, column);
+	//printf("%c \n", key);
 	return key;
 }
 /**
@@ -136,17 +144,16 @@ int get_col()
 	GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
 	GPIO_InitStruct.Pull = GPIO_NOPULL; 
 	HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
-	
-//		printf ("%d ", HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_3));
 //		printf ("%d ", HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_1));
+//		printf ("%d ", HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_3));
 //		printf ("%d ", HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_5));
 //		printf ("%d \n ", HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_6));
 //	
 	
-	if ( HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_3) == GPIO_PIN_RESET ) {
+	if ( HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_1) == GPIO_PIN_RESET ) {
 		return 0;
 	}
-	else if ( HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_1) == GPIO_PIN_RESET ) {
+	else if ( HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_3) == GPIO_PIN_RESET ) {
 		return 1;
 	}
 	else if ( HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_5) == GPIO_PIN_RESET ) {

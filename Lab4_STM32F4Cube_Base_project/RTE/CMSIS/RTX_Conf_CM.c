@@ -55,7 +55,7 @@
 //   <i> Defines default stack size for threads with osThreadDef stacksz = 0
 //   <i> Default: 200
 #ifndef OS_STKSIZE
- #define OS_STKSIZE     200      // this stack size value is in words
+ #define OS_STKSIZE     374      // this stack size value is in words
 #endif
  
 //   <o>Main Thread stack size [bytes] <64-32768:8><#/4>
@@ -172,7 +172,7 @@
 //   <i> Defines stack size for Timer thread.
 //   <i> Default: 200
 #ifndef OS_TIMERSTKSZ
- #define OS_TIMERSTKSZ  50     // this stack size value is in words
+ #define OS_TIMERSTKSZ  200     // this stack size value is in words
 #endif
  
 //   <o>Timer Callback Queue size <1-32>
