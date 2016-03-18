@@ -44,6 +44,8 @@ void Thread_temp (void const *argument) {
 	while(1){
 		osSignalWait(temp_flag, osWaitForever);
 		osMutexWait(temp_mutex, osWaitForever);
+		
+		//Update the display value of the temp every 250ms
 		if (display_mode == 0) {
 			if (display_counter % 250 == 0) {
 				//check_temperature_status(display_temp);
