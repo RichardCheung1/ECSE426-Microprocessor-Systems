@@ -3,8 +3,8 @@
   * @author  Taha Saifuddin, Richard Cheung
 	* @version V1.0.0
   * @date    17-March-2016
-  * @brief   This file implements the angle and temp calculation thread, and a  
-  *					 function which creates and starts the thread	
+  * @brief   This file implements the display angle selection thread, and a  
+  *					 function which creates and starts the thread
   ******************************************************************************
   */
 
@@ -51,23 +51,25 @@ void Thread_angle (void const *argument) {
 			if(EXTI0_flag_value == INTERRUPT_ACTIVE_FLAG) {
 				//Get the accelerometer readings
 				get_calibrated_acceleration();
+				
+				//Store pitch angle for display
+				if ( tilt_selection == 0) {
+					display_pitch = pitch;
+				}
+					
+				//Store roll angle for display
+				if (tilt_selection == 1) {
+					display_roll = roll;
+				}		
+				
+				if(display_angle_counter % 5 == 0) {
+					//check_temperature_status(display_temp);
+					display = tilt_selection == 0 ?  display_pitch: display_roll;
+					display_angle_counter = 0;
+				}
+			
 				//Reset the flag
 				EXTI0_flag_value = 0;
-			}
-			//Store pitch angle for display
-			if ( tilt_selection == 0) {
-				display_pitch = pitch;
-			}
-				
-			//Store roll angle for display
-			if (tilt_selection == 1) {
-				display_roll = roll;
-			}		
-			
-			if(display_angle_counter % 5 == 0) {
-				//check_temperature_status(display_temp);
-				display = tilt_selection == 0 ?  display_pitch: display_roll;
-				display_angle_counter = 0;
 			}
 		}
 		osMutexRelease(angle_mutex);

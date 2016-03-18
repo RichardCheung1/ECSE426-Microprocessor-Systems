@@ -117,6 +117,8 @@ void debouncer()
 				keypad_state = RELEASED;
 			}
 			break;
+			
+		//If the keypad is in released state
 		case RELEASED:
 			TIM3_counter = 0;
 			if(TIM3_counter % 1000 == 0){
