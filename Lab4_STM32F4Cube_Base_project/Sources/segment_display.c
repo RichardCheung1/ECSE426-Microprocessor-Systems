@@ -1,11 +1,11 @@
 /**
   ******************************************************************************
-  * File Name          : segment_display.c
-  * Description        : This class provides functionality for controlling the
-												 7 segment display
-	* Author						 : Richard Cheung, Taha Saifuddin
-	* Version            : 1.0.0
-	* Date							 : February 25th, 2016
+  * @file     : segment_display.c
+  * @brief    : This class provides functionality for controlling the
+								7 segment display
+	* @author		: Richard Cheung, Taha Saifuddin
+	* @version  : 2.0.0
+	* @date			: March 18th, 2016
   ******************************************************************************
   */
 	

@@ -1,10 +1,10 @@
 /**
   ******************************************************************************
-  * File Name          : accelerometer.h
-  * Description        : Accelerometer functions that can be used by other classes
-	* Author						 : Taha Saifuddin, Richard Cheung
-	* Version            : 1.0.0
-	* Date							 : March 9th, 2016
+  * @file       : accelerometer.h
+  * @brief      : Accelerometer functions that can be used by other classes
+	* @author			: Taha Saifuddin, Richard Cheung
+	* @version    : 2.0.0
+	* @date				: March 18th, 2016
   ******************************************************************************
   */
 

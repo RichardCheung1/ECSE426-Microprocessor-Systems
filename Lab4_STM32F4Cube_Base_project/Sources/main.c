@@ -1,8 +1,8 @@
 /*******************************************************************************
   * @file    main.c
-  * @author  Ashraf Suyyagh
+  * @author  Taha Saifuddin, Richard Cheung
 	* @version V1.2.0
-  * @date    17-January-2016
+  * @date    18th March 2016
   * @brief   This file demonstrates flasing one LED at an interval of one second
 	*          RTX based using CMSIS-RTOS 
   ******************************************************************************

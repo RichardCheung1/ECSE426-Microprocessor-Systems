@@ -1,13 +1,13 @@
 /**
   ******************************************************************************
-  * File Name          : segment_display.h
-  * Description        : Segment display functions that can be used by other classes
-	* Author						 : Taha Saifuddin, Richard Cheung
-	* Version            : 1.0.0
-	* Date							 : February 19th, 2016
+  * @file     : segment_display.h
+  * @brief    : Segment display functions that can be used by other classes
+	* @author		: Richard Cheung, Taha Saifuddin
+	* @version  : 2.0.0
+	* @date			: March 18th, 2016
   ******************************************************************************
   */
-
+	
 #ifndef __SEGMENT_DISPLAY_H
 #define __SEGMENT_DISPLAY_H
 

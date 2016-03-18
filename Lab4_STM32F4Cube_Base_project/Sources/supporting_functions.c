@@ -1,10 +1,10 @@
 /**
   ******************************************************************************
-  * File Name          : supporting_functions.c
-  * Description        : User defined common functions that can be used across projects
-	* Author						 : Ashraf Suyyagh
-	* Version            : 1.0.0
-	* Date							 : January 14th, 2016
+  * @file   	: supporting_functions.c
+  * @brief		: User defined common functions that can be used across projects
+	* @author		: Ashraf Suyyagh
+	* @version	: 2.0.0
+	* @date			: March 18th, 2016
   ******************************************************************************
   */
 #include "supporting_functions.h"

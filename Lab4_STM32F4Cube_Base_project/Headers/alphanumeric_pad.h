@@ -1,13 +1,14 @@
+
 /**
   ******************************************************************************
-  * File Name          : alphanumeric_pad.h
-  * Description        : 
-	* Author						 : Taha Saifuddin, Richard Cheung
-	* Version            : 2.0.0
-	* Date							 : March 15th, 2016
+  * @file     : alphanumeric_pad.h
+  * @brief    : This class provides functionality for configuring and 
+								controlling the alphanumeric keypad
+	* @author		: Richard Cheung, Taha Saifuddin
+	* @version  : 2.0.0
+	* @date			: March 18th, 2016
   ******************************************************************************
   */
-
 #ifndef __ALPHANUMERIC_PAD_H
 #define __ALPHANUMERIC_PAD_H
 

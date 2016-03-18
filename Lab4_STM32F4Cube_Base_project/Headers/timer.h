@@ -1,13 +1,13 @@
 /**
   ******************************************************************************
-  * File Name          : timer.h
-  * Description        : timer functions that can be used by other classes
-	* Author						 : Taha Saifuddin, Richard Cheung
-	* Version            : 1.0.0
-	* Date							 : March 8th, 2016
+  * @file      : timer.h
+  * @brief     : This class provides functionality for initializing the
+							 	 hardware timer
+	* @author		 : Richard Cheung, Taha Saifuddin
+	* @version   : 1.0.0
+	* @date			 : March 8th, 2016
   ******************************************************************************
   */
-
 #ifndef __TIMER_H
 #define __TIMER_H
 

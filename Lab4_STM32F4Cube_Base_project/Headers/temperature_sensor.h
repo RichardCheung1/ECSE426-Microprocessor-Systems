@@ -1,13 +1,14 @@
 /**
   ******************************************************************************
-  * File Name          : temperature_sensor.h
-  * Description        : Temperature sensor functions that can be used by other classes
-	* Author						 : Taha Saifuddin, Richard Cheung
-	* Version            : 1.0.0
-	* Date							 : February 19th, 2016
+  * @file      : temperature_sensor.h
+  * @brief     : This source file enables reading temp sensor voltage and its 
+							   conversion to celcius, and checking if it's in a safe range
+	* @author		 : Taha Saifuddin, Richard Cheung
+	* @version   : 2.0.0
+	* @date			 : March 18th, 2016
   ******************************************************************************
   */
-	
+
 #ifndef TEMPERATURE_SENSOR_H
 #define TEMPERATURE_SENSOR_H
 

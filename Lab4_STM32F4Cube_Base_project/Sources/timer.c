@@ -1,19 +1,22 @@
 /**
   ******************************************************************************
-  * File Name          : timer.c
-  * Description        : This class provides functionality for initializing the
-												 timer
-	* Author						 : Richard Cheung, Taha Saifuddin
-	* Version            : 1.0.0
-	* Date							 : March 8th, 2016
+  * @file      : timer.c
+  * @brief     : This class provides functionality for initializing the
+							 	 hardware timer
+	* @author		 : Richard Cheung, Taha Saifuddin
+	* @version   : 1.0.0
+	* @date			 : March 8th, 2016
   ******************************************************************************
   */
 
+/* Includes ------------------------------------------------------------------*/
 #include "timer.h"
+
+/* Variables -----------------------------------------------------------------*/
 TIM_HandleTypeDef TIM3_Handle;
 
-/*
-   * @brief A function used to configure and init the timer
+/**
+   * @brief: A function used to configure and init the timer
    */
 void TIM_Init() 
 {
@@ -34,5 +37,4 @@ void TIM_Init()
 	HAL_NVIC_EnableIRQ(TIM3_IRQn);
 	HAL_NVIC_SetPriority(TIM3_IRQn, 0, 1);
 }
-
 

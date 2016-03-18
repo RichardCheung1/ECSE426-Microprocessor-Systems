@@ -7,15 +7,20 @@
   *					 function which creates and starts the thread		
   ******************************************************************************
   */
-	
+
+/* Includes ----------------------------------------------------------------- */
 #include "cmsis_os.h"                   // ARM::CMSIS:RTOS:Keil RTX
 #include "stm32f4xx_hal.h"
 #include "main.h"
 
-void Thread_check_temp (void const *argument);                 // thread function
-osThreadId tid_Thread_check_temp;                              // thread id
-osThreadDef(Thread_check_temp, osPriorityNormal, 1, 0);
+/* Variables -----------------------------------------------------------------*/
 GPIO_InitTypeDef 				LED_configuration;
+
+/* Functions -----------------------------------------------------------------*/
+void Thread_check_temp (void const *argument);                 // thread function
+
+osThreadId tid_Thread_check_temp;                              // thread id
+osThreadDef(Thread_check_temp, osPriorityNormal, 1, 0);				 // set thread priority
 
 /*----------------------------------------------------------------------------
  *      Create the thread within RTOS context

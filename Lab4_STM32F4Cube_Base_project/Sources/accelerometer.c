@@ -1,11 +1,11 @@
 /**
   ******************************************************************************
-  * File Name          : accelerometer.c
-  * Description        : This class provides functionality for configuring and 
-												 controlling the accelerometer
-	* Author						 : Taha Saifuddin, Richard Cheung
-	* Version            : 1.0.0
-	* Date							 : March 9th, 2016
+  * @file     : accelerometer.c
+  * @brief    : This class provides functionality for configuring and 
+								controlling the accelerometer
+	* @author		: Taha Saifuddin, Richard Cheung
+	* @version	: 2.0.0
+	* @date			: March 18th, 2016
   ******************************************************************************
   */
 
@@ -14,7 +14,7 @@
 #include "math.h"
 
 /* Defines -------------------------------------------------------------------*/
-#define THRESHOLD_TOLERANCE 5.0f
+//#define THRESHOLD_TOLERANCE 5.0f
 
 /* Variables -----------------------------------------------------------------*/
 LIS3DSH_InitTypeDef LIS3DSH_InitStruct;
@@ -38,7 +38,7 @@ float calibration_param_matrix[4][3] = {
 
 /* Private function prototypes -----------------------------------------------*/
 void print_filtered_acceleration(void);
-int Kalmanfilter_C(float measured_acceleration, kalman_state* kstate);
+//int Kalmanfilter_C(float measured_acceleration, kalman_state* kstate);
 void calculate_angles(void);
 
 /**

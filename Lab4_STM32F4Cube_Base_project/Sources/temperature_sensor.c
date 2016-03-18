@@ -1,11 +1,11 @@
 /**
   ******************************************************************************
-  * File Name          : temperature_sensor.c
-  * Description        : This source file enables reading temp sensor voltage
-												 and its conversion to celcius
-	* Author						 : Richard Cheung, Taha Saifuddin
-	* Version            : 1.0.0
-	* Date							 : February 19th, 2016
+  * @file      : temperature_sensor.c
+  * @brief     : This source file enables reading temp sensor voltage and its 
+							   conversion to celcius, and checking if it's in a safe range
+	* @author		 : Taha Saifuddin, Richard Cheung
+	* @version   : 2.0.0
+	* @date			 : March 18th, 2016
   ******************************************************************************
   */
 
@@ -61,7 +61,7 @@ void configure_init_temp_sensor(void)
 	set_adc_channel(); 
 	
 	//Start polling mode - commented out as we are going to do it in 
-	//each iteration of the while loop of the calculation thread
+	//each iteration of the while loop of the check_temp thread
 	/*if (HAL_ADC_Start(&ADC1_Handle) != HAL_OK) {
 		Error_Handler(ADC_START_FAIL);
 	}*/
@@ -87,6 +87,7 @@ void set_adc_channel (void) {
 
 /**
    * @brief A function used to convert the sensor data to temperature in celcius
+	 * @param voltage: the scaled voltage value at the current temperature
 	 * @retval temperature_celcius: float containing the temperature value in celcius
    */
 float convert_voltage_to_celcius (float voltage) {
