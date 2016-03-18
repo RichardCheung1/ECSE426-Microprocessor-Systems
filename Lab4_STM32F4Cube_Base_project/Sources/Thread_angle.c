@@ -18,7 +18,7 @@ osThreadDef(Thread_angle, osPriorityNormal, 1, 0);
 
 /* Variables -----------------------------------------------------------------*/
 int display_angle_counter; 
-
+int angle_flag = 2;
 /* Functions -----------------------------------------------------------------*/
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
@@ -44,17 +44,16 @@ void Thread_angle (void const *argument) {
 	display_angle_counter = 0;
 
 	while(1){
-		osSignalWait(0x01, osWaitForever);
+		osSignalWait(angle_flag, osWaitForever);
 		osMutexWait(angle_mutex, osWaitForever);
 		if (display_mode == 1) {		
 			//If the EXTI0 callback function is called and flag is set to active, read accelerometer values
 			if(EXTI0_flag_value == INTERRUPT_ACTIVE_FLAG) {
-					//Get the accelerometer readings
+				//Get the accelerometer readings
 				get_calibrated_acceleration();
-					//Reset the flag
+				//Reset the flag
 				EXTI0_flag_value = 0;
 			}
-			
 			//Store pitch angle for display
 			if ( tilt_selection == 0) {
 				display_pitch = pitch;
@@ -72,7 +71,7 @@ void Thread_angle (void const *argument) {
 			}
 		}
 		osMutexRelease(angle_mutex);
-		//osSignalSet(main_thread_id, 0x01);
+		osSignalClear(tid_Thread_angle, angle_flag);
 	}
 }
 
@@ -84,6 +83,6 @@ void Thread_angle (void const *argument) {
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	if(display_mode == 1)	display_angle_counter++;
-	osSignalSet(tid_Thread_angle, 0x01);
+	osSignalSet(tid_Thread_angle, angle_flag);
 	EXTI0_flag_value = 1;
 }

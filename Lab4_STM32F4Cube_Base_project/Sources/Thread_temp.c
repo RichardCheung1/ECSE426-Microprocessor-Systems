@@ -16,6 +16,7 @@ void Thread_temp (void const *argument);                 // thread function
 osThreadId tid_Thread_temp;                              // thread id
 osThreadDef(Thread_temp, osPriorityNormal, 1, 0);
 int display_counter; 
+int temp_flag =1;
 
 /*----------------------------------------------------------------------------
  *      Create the thread within RTOS context
@@ -31,13 +32,11 @@ int start_Thread_temp (void) {
 *      Thread  'Thread_temp': provide values for temperatures
  *---------------------------------------------------------------------------*/
 void Thread_temp (void const *argument) {
-	//Variables to store temperature
-	//float temperature = 0.0f;
 	display_temp = 0.0f;
 	display_counter = 0;
 	
 	while(1){
-		osSignalWait(0x01, osWaitForever);
+		osSignalWait(temp_flag, osWaitForever);
 		osMutexWait(temp_mutex, osWaitForever);
 		if (display_mode == 0) {
 			if (display_counter % 250 == 0) {
@@ -45,10 +44,9 @@ void Thread_temp (void const *argument) {
 				display = display_temp;	
 				display_counter = 0;
 			}
-			
 		}		
 		osMutexRelease(temp_mutex);
-		//osSignalSet(main_thread_id, 0x01);
+		osSignalClear(tid_Thread_temp, temp_flag);
 	}
 }
 
@@ -61,5 +59,5 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	TIM3_counter ++;
 	if(display_mode == 0) display_counter++; 
-	osSignalSet(tid_Thread_temp, 0x01);
+	osSignalSet(tid_Thread_temp, temp_flag);
 }
